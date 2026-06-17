@@ -25,10 +25,10 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      {/* ২. বডিতে bg-slate-50 বা হালকা ব্যাকগ্রাউনড কালার দেওয়া হয়েছে যাতে নেভবার ও কন্টেন্ট ফুটে ওঠে */}
+  
       <body className="min-h-full flex flex-col bg-slate-50 font-sans selection:bg-yellow-200">
         
-        {/* গ্লোবাল নেভিগেশন বার */}
+     
         <Navbar />
         <main className="flex-1">
           {children}

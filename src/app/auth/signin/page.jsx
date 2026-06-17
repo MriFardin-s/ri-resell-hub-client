@@ -15,6 +15,8 @@ export default function SignIn() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+ 
+
   const handleSignIn = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -26,7 +28,7 @@ export default function SignIn() {
       const { data, error: authError } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: '/dashboard', 
+        callbackURL: '/', 
       });
 
       if (authError) {
@@ -37,7 +39,7 @@ export default function SignIn() {
 
       setSuccess('Welcome back! Redirecting to dashboard...');
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push('/');
       }, 1500);
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
