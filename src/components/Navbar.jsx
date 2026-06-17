@@ -69,8 +69,8 @@ export default function Navbar() {
                         
                         <div className="hidden sm:flex space-x-2">
                             <Link
-                                href="/signin"
-                                className={`px-6 py-2.5 rounded-md shadow-sm text-sm transition-colors duration-200 ${pathname === '/signin'
+                                href="/auth/signin"
+                                className={`px-6 py-2.5 rounded-md shadow-sm text-sm transition-colors duration-200 ${pathname === '/auth/signin'
                                         ? 'btn-theme-yellow' 
                                         : 'bg-neutral text-black'      
                                     }`}
@@ -79,8 +79,8 @@ export default function Navbar() {
                             </Link>
 
                             <Link
-                                href="/signup"
-                                className={`px-6 py-2.5 rounded-md shadow-sm text-sm transition-colors duration-200 ${pathname === '/signup'
+                                href="/auth/signup"
+                                className={`px-6 py-2.5 rounded-md shadow-sm text-sm transition-colors duration-200 ${pathname === '/auth/signup'
                                         ? 'btn-theme-yellow' 
                                         : 'bg-neutral text-black'      
                                     }`}
@@ -149,8 +149,8 @@ export default function Navbar() {
               
                     <div className="pt-4 border-t border-gray-200 flex flex-col space-y-2 sm:hidden">
                          <Link
-                                href="/signin"
-                                className={`px-6 py-2.5 rounded-md shadow-sm text-sm transition-colors duration-200 ${pathname === '/signin'
+                                href="/auth/signin"
+                                className={`px-6 py-2.5 rounded-md shadow-sm text-sm transition-colors duration-200 ${pathname === '/auth/signin'
                                         ? 'btn-theme-yellow' 
                                         : 'bg-neutral text-black'      
                                     }`}
@@ -159,8 +159,8 @@ export default function Navbar() {
                             </Link>
 
                             <Link
-                                href="/signup"
-                                className={`px-6 py-2.5 rounded-md shadow-sm text-sm transition-colors duration-200 ${pathname === '/signup'
+                                href="/auth/signup"
+                                className={`px-6 py-2.5 rounded-md shadow-sm text-sm transition-colors duration-200 ${pathname === '/auth/signup'
                                         ? 'btn-theme-yellow' 
                                         : 'bg-neutral text-black'      
                                     }`}
