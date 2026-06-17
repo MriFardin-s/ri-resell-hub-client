@@ -1,0 +1,66 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+
+@layer base {
+  :root {
+    /* ইয়েলোইশ থিমের জন্য কাস্টম গ্লোবাল ভেরিয়েবল */
+    --theme-yellow-primary: #facc15;   /* bg-yellow-400 */
+    --theme-yellow-hover: #eab308;     /* bg-yellow-500 */
+    --theme-bg-light: #fefce8;         /* হালকা হলুদ ব্যাকগ্রাউন্ড শেড */
+    --theme-text-dark: #1f2937;        /* টেক্সটের জন্য ডার্ক গ্রে */
+  }
+
+  body {
+    color: var(--theme-text-dark);
+    background-color: #ffffff;
+    font-family: '__Inter_aaf875', '__Inter_Fallback_aaf875', sans-serif; /* বা আপনার প্রোজেক্টের ডিফল্ট ফন্ট */
+  }
+
+  /* সুন্দর ইয়েলোইশ স্ক্রোলবার */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--theme-yellow-primary);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-yellow-hover);
+  }
+}
+
+@layer components {
+  /* বাটনগুলোর জন্য গ্লোবাল কাস্টম ক্লাস (কোড আরও ক্লিন রাখার জন্য) */
+  .btn-theme-yellow {
+    background-color: var(--theme-yellow-primary);
+    color: #111827;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .btn-theme-yellow:hover {
+    background-color: var(--theme-yellow-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(234, 179, 8, 0.2), 0 2.5px 4px -1px rgba(234, 179, 8, 0.1);
+  }
+
+  /* প্রোফাইল ড্রপডাউনের স্মুথ অ্যানিমেশন */
+  .animate-fade-in {
+    animation: fadeIn 0.2s ease-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

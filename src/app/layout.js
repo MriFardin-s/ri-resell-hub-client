@@ -1,0 +1,40 @@
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+// ১. প্রজেক্টের নাম এবং মেটাডেটা আপডেট করা হয়েছে
+export const metadata = {
+  title: "Resell Hub | Buy & Sell Quality Products",
+  description: "The ultimate marketplace for reselling and buying products easily.",
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      {/* ২. বডিতে bg-slate-50 বা হালকা ব্যাকগ্রাউনড কালার দেওয়া হয়েছে যাতে নেভবার ও কন্টেন্ট ফুটে ওঠে */}
+      <body className="min-h-full flex flex-col bg-slate-50 font-sans selection:bg-yellow-200">
+        
+        {/* গ্লোবাল নেভিগেশন বার */}
+        <Navbar />
+        <main className="flex-1">
+          {children}
+        </main>
+        <Footer/>
+      </body>
+    </html>
+  );
+}
