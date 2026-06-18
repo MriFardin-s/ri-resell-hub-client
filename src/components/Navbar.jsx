@@ -44,7 +44,7 @@ export default function Navbar() {
         }
     };
 
-    if (isPending || isLoggingOut) {
+    if (isLoggingOut) {
         return (
             <nav className="bg-white shadow-md border-b-2 border-yellow-400 sticky top-0 z-50 h-16 flex items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-2xl font-black tracking-wider text-neutral-800">
@@ -130,7 +130,7 @@ export default function Navbar() {
                                             disabled={isLoggingOut}
                                             className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition text-left disabled:opacity-50"
                                         >
-                                          Logout
+                                          Sign Out
                                         </button>
                                     </div>
                                 )}
@@ -192,7 +192,7 @@ export default function Navbar() {
                                     disabled={isLoggingOut}
                                     className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
                                 >
-                                    Logout
+                                    Sign Out
                                 </button>
                             </div>
                         ) : (

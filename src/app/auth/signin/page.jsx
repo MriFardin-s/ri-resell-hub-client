@@ -3,19 +3,21 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Card, Form, TextField, Label, Input, Description, FieldError } from '@heroui/react';
-import { ChevronLeft, Envelope, Key, TriangleExclamation, CircleCheck } from '@gravity-ui/icons';
-import { authClient } from '@/lib/auth-client'; 
+import { ChevronLeft, Envelope, Key, TriangleExclamation, CircleCheck, Eye, EyeSlash } from '@gravity-ui/icons';
+import { authClient } from '@/lib/auth-client';
 import Link from 'next/link';
 
 export default function SignIn() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  
 
- 
+
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -24,11 +26,11 @@ export default function SignIn() {
     setSuccess('');
 
     try {
-      
+
       const { data, error: authError } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: '/', 
+        callbackURL: '/',
       });
 
       if (authError) {
@@ -60,10 +62,10 @@ export default function SignIn() {
 
   return (
     <div className="min-h-screen bg-neutral-900 flex items-center justify-center p-4 relative overflow-hidden">
-    
+
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(250,204,21,0.07),transparent_50%)]" />
 
-   
+
       <div className="absolute top-6 left-4 sm:left-8 z-10">
         <Link href="/" className="inline-flex items-center space-x-2 text-gray-400 hover:text-yellow-400 font-medium transition text-sm">
           <ChevronLeft className="w-4 h-4" />
@@ -82,7 +84,7 @@ export default function SignIn() {
         </Card.Header>
 
         <Card.Content className="p-0 space-y-4">
-    
+
           {error && (
             <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 flex items-start space-x-2.5 text-red-400 text-xs">
               <TriangleExclamation className="w-4 h-4 mt-0.5 shrink-0" />
@@ -90,7 +92,7 @@ export default function SignIn() {
             </div>
           )}
 
-       
+
           {success && (
             <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-3 flex items-start space-x-2.5 text-green-400 text-xs">
               <CircleCheck className="w-4 h-4 mt-0.5 shrink-0" />
@@ -99,7 +101,7 @@ export default function SignIn() {
           )}
 
           <Form onSubmit={handleSignIn} className="space-y-4 w-full">
-       
+
             <TextField className="w-full space-y-1">
               <Label className="text-gray-300 font-medium text-xs pl-1">Email Address</Label>
               <div className="relative">
@@ -117,7 +119,7 @@ export default function SignIn() {
               <FieldError />
             </TextField>
 
-      
+
             <TextField className="w-full space-y-1">
               <div className="flex justify-between items-center pl-1 pr-1">
                 <Label className="text-gray-300 font-medium text-xs">Password</Label>
@@ -126,15 +128,30 @@ export default function SignIn() {
                 </Link>
               </div>
               <div className="relative">
+          
                 <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+
                 <Input
-                  type="password"
+                  type={showPassword ? "text" : "password"} 
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-neutral-900 border border-neutral-700 hover:border-yellow-400/50 focus:border-yellow-400 transition-colors h-11 rounded-xl text-white placeholder:text-gray-500 text-sm pl-11 pr-4 w-full outline-none"
+       
+                  className="bg-neutral-900 border border-neutral-700 hover:border-yellow-400/50 focus:border-yellow-400 transition-colors h-11 rounded-xl text-white placeholder:text-gray-500 text-sm pl-11 pr-12 w-full outline-none"
                 />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-white hover:bg-yellow-400 text-neutral-900 p-1.5 rounded-lg transition-colors focus:outline-none shadow-md flex items-center justify-center"
+                >
+                  {showPassword ? (
+                    <EyeSlash className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
               <Description />
               <FieldError />
@@ -156,7 +173,7 @@ export default function SignIn() {
             </span>
           </div>
 
-   
+
           <Button
             type="button"
             variant="bordered"

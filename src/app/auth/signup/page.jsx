@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, Card, Form, TextField, Label, Input, Description, FieldError } from '@heroui/react';
-import { ChevronLeft, Envelope, Key, Person, Plus, TriangleExclamation, CircleCheck } from '@gravity-ui/icons';
+import { Button, Card, Form, TextField, Label, Input, Description, Radio, RadioGroup, FieldError } from '@heroui/react';
+import { ChevronLeft, Envelope, Key, Person, Plus, TriangleExclamation, CircleCheck, Eye, EyeSlash } from '@gravity-ui/icons';
 import { signUp } from '@/lib/auth-client';
 import Link from 'next/link';
 
@@ -12,6 +12,8 @@ export default function SignUp() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState('buyer');
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +47,6 @@ export default function SignUp() {
     setIsLoading(true);
     setError('');
     setSuccess('');
-
 
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!passwordRegex.test(password)) {
@@ -82,10 +83,11 @@ export default function SignUp() {
       const { data, error: authError } = await signUp.email({
         email,
         password,
+        role,
         name,
         image: imageUrl,
       });
-     
+
 
       if (authError) {
         setError(authError.message || 'Something went wrong. Please try again.');
@@ -199,20 +201,63 @@ export default function SignUp() {
               <FieldError />
             </TextField>
 
+            <div className="flex flex-col gap-2">
+              <Label className="text-gray-300 font-medium text-xs pl-1">Role</Label>
+             
+              <RadioGroup defaultValue="buyer" name="role" onChange={value => setRole(value)} orientation="horizontal" className="flex flex-row space-x-6">
+                <Radio value="buyer">
+                  <Radio.Content className="flex items-center gap-2">
+                    <Radio.Control>
+                      <Radio.Indicator />
+                    </Radio.Control>
+                  
+                    <span className="text-sm font-medium text-gray-200 hover:text-white cursor-pointer transition-colors">
+                      Buyer
+                    </span>
+                  </Radio.Content>
+                </Radio>
+
+                <Radio value="seller">
+                  <Radio.Content className="flex items-center gap-2">
+                    <Radio.Control>
+                      <Radio.Indicator />
+                    </Radio.Control>
+                    <span className="text-sm font-medium text-gray-200 hover:text-white cursor-pointer transition-colors">
+                      Seller
+                    </span>
+                  </Radio.Content>
+                </Radio>
+              </RadioGroup>
+            </div>
+
+
             <TextField className="w-full space-y-1">
               <Label className="text-gray-300 font-medium text-xs pl-1">Password</Label>
               <div className="relative">
                 <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
                 <Input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-neutral-900 border border-neutral-700 hover:border-yellow-400/50 focus:border-yellow-400 transition-colors h-11 rounded-xl text-white placeholder:text-gray-500 text-sm pl-11 pr-4 w-full outline-none"
+                  className="bg-neutral-900 border border-neutral-700 hover:border-yellow-400/50 focus:border-yellow-400 transition-colors h-11 rounded-xl text-white placeholder:text-gray-500 text-sm pl-11 pr-12 w-full outline-none"
                 />
+
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-white hover:bg-yellow-400 text-neutral-900 p-1.5 rounded-lg transition-colors focus:outline-none shadow-md flex items-center justify-center"
+                >
+                  {showPassword ? (
+                    <EyeSlash className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
-      
+
               <p className="text-[10px] text-gray-500 pl-1 pt-0.5">
                 Must be at least 8 characters with 1 capital letter and 1 number.
               </p>
