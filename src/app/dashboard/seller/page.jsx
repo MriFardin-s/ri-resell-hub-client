@@ -22,7 +22,7 @@ const SellerHomePage = () => {
     },
     {
       title: 'Total Revenue',
-      value: '৳45,200',
+      value: '$45,200',
       icon: CrownDiamond,
       change: 'Completed earnings'
     },
@@ -48,7 +48,7 @@ const SellerHomePage = () => {
 
       <div className="space-y-2 relative z-10">
         <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-white">
-          Welcome, <span className="text-yellow-400">{user?.name || 'Seller'}</span>!
+          Welcome, <span className="text-yellow-400">{user?.name }</span>!
         </h1>
         <p className="text-xs lg:text-sm text-gray-400 font-medium tracking-wide uppercase">
           Resell Hub Smart Dashboard Overview

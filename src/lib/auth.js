@@ -20,6 +20,18 @@ export const auth = betterAuth({
     additionalFields: {
     role: {
       default: "buyer"
+    },
+    country: {
+      type: "string",
+      required: true 
+    },
+    address: {
+      type: "string",
+      required: true 
+    },
+    phone: {
+      type: "string",
+      required: true 
     }
    }}
 

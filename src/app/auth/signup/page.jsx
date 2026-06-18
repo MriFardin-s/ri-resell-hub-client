@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, Card, Form, TextField, Label, Input, Description, Radio, RadioGroup, FieldError } from '@heroui/react';
+import { Button, Card, Form, TextField, Label, Input, Description, Radio, RadioGroup, FieldError, ListBoxItem, ListBox, SelectPopover, SelectValue, SelectTrigger, Select } from '@heroui/react';
 import { ChevronLeft, Envelope, Key, Person, Plus, TriangleExclamation, CircleCheck, Eye, EyeSlash } from '@gravity-ui/icons';
 import { signUp } from '@/lib/auth-client';
 import Link from 'next/link';
@@ -11,6 +11,9 @@ export default function SignUp() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [country, setCountry] = useState('');
+  const [address, setAddress] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('buyer');
@@ -86,19 +89,28 @@ export default function SignUp() {
         role,
         name,
         image: imageUrl,
+        country,
+        address,
+        phone,
       });
-
+      console.log('Sign-up response:', { data, authError });
 
       if (authError) {
-        setError(authError.message || 'Something went wrong. Please try again.');
+        setError(authError.message || 'Registration failed. Please check your inputs.');
         setIsLoading(false);
         return;
       }
 
-      setSuccess('Account created successfully! Redirecting to dashboard...');
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 2000);
+      if (data) {
+        setSuccess('Account created successfully! Redirecting to dashboard...');
+        setError('');
+        setIsLoading(false);
+
+        setTimeout(() => {
+          router.push('/');
+        }, 2000);
+      }
+
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
       setIsLoading(false);
@@ -201,16 +213,60 @@ export default function SignUp() {
               <FieldError />
             </TextField>
 
+            {/* Country Select */}
+            <Select label="Country" selectedKey={country} onSelectionChange={setCountry} className="w-full" placeholder="Select your country">
+              <Label className="text-gray-300 font-medium text-xs pl-1">Country</Label>
+              <SelectTrigger className="bg-neutral-900 border border-neutral-700 h-11 rounded-xl text-white">
+                <SelectValue  />
+              </SelectTrigger>
+              <SelectPopover className="bg-neutral-800 border border-neutral-700 w-[var(--trigger-width)] rounded-xl mt-1 p-1">
+                <ListBox>
+                  <ListBoxItem id="bd" className="text-white hover:bg-neutral-700 p-2 rounded-lg cursor-pointer">Bangladesh</ListBoxItem>
+                  <ListBoxItem id="in" className="text-white hover:bg-neutral-700 p-2 rounded-lg cursor-pointer">India</ListBoxItem>
+                  <ListBoxItem id="us" className="text-white hover:bg-neutral-700 p-2 rounded-lg cursor-pointer">United States</ListBoxItem>
+                  <ListBoxItem id="uk" className="text-white hover:bg-neutral-700 p-2 rounded-lg cursor-pointer">United Kingdom</ListBoxItem>
+                </ListBox>
+              </SelectPopover>
+            </Select>
+
+            {/* Address Text Field */}
+            <TextField className="w-full space-y-1">
+              <Label className="text-gray-300 font-medium text-xs pl-1">Address</Label>
+              <Input
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Enter your street address"
+                className="bg-neutral-900 border border-neutral-700 h-11 rounded-xl text-white text-sm px-4 w-full outline-none"
+              />
+            </TextField>
+
+            {/* Phone Number with Country Code */}
+            <div className="flex flex-col gap-1 w-full">
+              <Label className="text-gray-300 font-medium text-xs pl-1">Phone Number</Label>
+              <div className="flex items-center bg-neutral-900 border border-neutral-700 rounded-xl overflow-hidden focus-within:border-yellow-400 transition-all h-11">
+                <span className="px-3 text-gray-400 border-r border-neutral-700 bg-neutral-800/50 h-full flex items-center text-sm">
+                  +880
+                </span>
+                <input
+                  type="tel"
+                  placeholder="17XXXXXXXX"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="bg-transparent text-white text-sm px-4 w-full h-full outline-none placeholder:text-gray-600"
+                />
+              </div>
+            </div>
+
             <div className="flex flex-col gap-2">
               <Label className="text-gray-300 font-medium text-xs pl-1">Role</Label>
-             
+
               <RadioGroup defaultValue="buyer" name="role" onChange={value => setRole(value)} orientation="horizontal" className="flex flex-row space-x-6">
                 <Radio value="buyer">
                   <Radio.Content className="flex items-center gap-2">
                     <Radio.Control>
                       <Radio.Indicator />
                     </Radio.Control>
-                  
+
                     <span className="text-sm font-medium text-gray-200 hover:text-white cursor-pointer transition-colors">
                       Buyer
                     </span>
@@ -230,7 +286,6 @@ export default function SignUp() {
               </RadioGroup>
             </div>
 
-
             <TextField className="w-full space-y-1">
               <Label className="text-gray-300 font-medium text-xs pl-1">Password</Label>
               <div className="relative">
@@ -243,7 +298,6 @@ export default function SignUp() {
                   required
                   className="bg-neutral-900 border border-neutral-700 hover:border-yellow-400/50 focus:border-yellow-400 transition-colors h-11 rounded-xl text-white placeholder:text-gray-500 text-sm pl-11 pr-12 w-full outline-none"
                 />
-
 
                 <button
                   type="button"
