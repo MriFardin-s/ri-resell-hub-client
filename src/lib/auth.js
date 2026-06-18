@@ -21,18 +21,6 @@ export const auth = betterAuth({
     role: {
       default: "buyer"
     },
-    country: {
-      type: "string",
-      required: true 
-    },
-    address: {
-      type: "string",
-      required: true 
-    },
-    phone: {
-      type: "string",
-      required: true 
-    }
    }}
 
 });

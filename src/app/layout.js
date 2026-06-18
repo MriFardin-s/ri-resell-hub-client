@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Providers from "@/components/Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,7 +14,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// ১. প্রজেক্টের নাম এবং মেটাডেটা আপডেট করা হয়েছে
 export const metadata = {
   title: "Resell Hub | Buy & Sell Quality Products",
   description: "The ultimate marketplace for reselling and buying products easily.",
@@ -25,15 +25,14 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-  
-      <body className="min-h-full flex flex-col bg-slate-50 font-sans selection:bg-yellow-200">
-        
-     
-        <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer/>
+      <body className="min-h-full flex flex-col bg-white font-sans selection:bg-yellow-200">
+        <Providers>
+          <Navbar />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

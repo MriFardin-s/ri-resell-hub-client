@@ -1,16 +1,21 @@
 'use client';
 import React, { useState } from 'react';
 import {
-    Form, Fieldset, TextField, Input, TextArea, Select, Label,
+    Form, Fieldset, TextField, Input, Select, Label,
     SelectTrigger, SelectValue, SelectIndicator, SelectPopover,
     ListBox, ListBoxItem, Button
-} from "@heroui/react"; 
+} from "@heroui/react";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation"; 
+import { addProduct } from '@/lib/actions/products';
 
 export function AddProductForm() {
+    const router = useRouter();  
     const [previews, setPreviews] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [selectedCondition, setSelectedCondition] = useState("");
+    const [errors, setErrors] = useState({});
 
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
@@ -31,10 +36,19 @@ export function AddProductForm() {
         }));
 
         setPreviews((prev) => [...prev, ...newPreviews].slice(0, 3));
+        if (newPreviews.length > 0) {
+            setErrors(prev => ({ ...prev, images: null }));
+        }
     };
 
     const removeImage = (id) => {
-        setPreviews((prev) => prev.filter((img) => img.id !== id));
+        setPreviews((prev) => {
+            const updated = prev.filter((img) => img.id !== id);
+            if (updated.length === 0) {
+                setErrors(prevErr => ({ ...prevErr, images: "At least one product image is required" }));
+            }
+            return updated;
+        });
     };
 
     const handleSubmit = async (e) => {
@@ -42,10 +56,39 @@ export function AddProductForm() {
         setIsLoading(true);
 
         const formData = new FormData(e.currentTarget);
+        const rawData = Object.fromEntries(formData.entries());
+
+        const categoryValue = selectedCategory && typeof selectedCategory === 'object'
+            ? (selectedCategory.currentKey || Array.from(selectedCategory)[0] || "")
+            : selectedCategory;
+
+        const conditionValue = selectedCondition && typeof selectedCondition === 'object'
+            ? (selectedCondition.currentKey || Array.from(selectedCondition)[0] || "")
+            : selectedCondition;
+
+        const newErrors = {};
+        if (!rawData.title) newErrors.title = "Product title is required";
+        if (!rawData.description) newErrors.description = "Description is required";
+        if (!categoryValue) newErrors.category = "Category is required";
+        if (!conditionValue) newErrors.condition = "Condition is required";
+        if (!rawData.price) newErrors.price = "Price is required";
+        if (!rawData.stock) newErrors.stock = "Stock quantity is required";
+        if (previews.length === 0) newErrors.images = "At least one product image is required";
+
+        if (!rawData.country) newErrors.country = "Country is required";
+        if (!rawData.address) newErrors.address = "Address is required";
+        if (!rawData.phone) newErrors.phone = "Phone number is required";
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            setIsLoading(false);
+            return;
+        }
+
+        setErrors({});
 
         try {
-            const imageUrls = [];
-            for (const img of previews) {
+            const uploadPromises = previews.map(async (img) => {
                 const imgFormData = new FormData();
                 imgFormData.append('image', img.file);
 
@@ -54,46 +97,56 @@ export function AddProductForm() {
                     body: imgFormData
                 });
                 const result = await response.json();
-                if (result.success) {
-                    imageUrls.push(result.data.url);
-                }
+                return result.success ? result.data.url : null;
+            });
+
+            const uploadedUrls = await Promise.all(uploadPromises);
+            const imageUrls = uploadedUrls.filter(url => url !== null);
+
+            if (imageUrls.length === 0 && previews.length > 0) {
+                toast.error("Failed to upload images. Please try again.");
+                setIsLoading(false);
+                return;
             }
 
-            const productData = {
-                title: formData.get("title"),
-                description: formData.get("description"),
-                category: selectedCategory,
-                condition: selectedCondition,
-                price: formData.get("price"),
-                stock: formData.get("stock"),
+            const newProductData = {
+                ...rawData,
+                category: categoryValue,
+                condition: conditionValue,
+                price: Number(rawData.price),
+                stock: Number(rawData.stock),
+                status: "available",
                 images: imageUrls
             };
 
-            const res = await fetch('/api/products', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(productData)
-            });
+            console.log("Submitting product data:", newProductData);
 
-            if (res.ok) {
-                alert("Product created successfully!");
+            const res = await addProduct(newProductData);
+
+            if (res.insertedId || res.success) {
+                toast.success("Product created successfully!");
+                e.target.reset();
                 setPreviews([]);
+                setSelectedCategory("");
+                setSelectedCondition("");
+                router.push("/dashboard/seller/products");
+            } else {
+                toast.error(res.message || "Failed to create product");
+                setIsLoading(false);
             }
         } catch (error) {
-            console.error(error);
-            alert("Failed to create product.");
-        } finally {
+            console.error("Something went wrong:", error);
+            toast.error("An unexpected error occurred.");
             setIsLoading(false);
         }
-    };
-
+    }; 
     return (
         <div className="max-w-2xl mx-auto p-6 bg-neutral-950 border border-neutral-900 rounded-2xl">
             <h2 className="text-xl font-black text-white mb-6">ADD NEW PRODUCT</h2>
 
-            <Form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            <Form onSubmit={handleSubmit} className="flex flex-col gap-6" validationErrors={errors} validationBehavior='aria'>
                 <Fieldset className="flex flex-col gap-5">
-                 
+
                     <div className="flex flex-col gap-4">
                         <Label className="text-sm font-medium text-gray-400">Product Images (Upload up to 3)</Label>
                         <input
@@ -101,8 +154,10 @@ export function AddProductForm() {
                             multiple
                             accept="image/*"
                             onChange={handleImageChange}
-                            className="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-800 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-yellow-400 file:text-black hover:file:bg-yellow-500 cursor-pointer"
+                            className={`w-full p-3 rounded-xl bg-neutral-900 border text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-yellow-400 file:text-black hover:file:bg-yellow-500 cursor-pointer ${errors.images ? 'border-red-500' : 'border-neutral-800'}`}
                         />
+                        {errors.images && <p className="text-xs text-red-500 pl-1">{errors.images}</p>}
+
                         <div className="flex gap-2 mt-2">
                             {previews.map((img) => (
                                 <div key={img.id} className="relative w-20 h-20">
@@ -119,28 +174,26 @@ export function AddProductForm() {
                         </div>
                     </div>
 
-                    
-                    <TextField className="w-full flex flex-col gap-1.5">
+                    <TextField isInvalid={!!errors.title} errorMessage={errors.title} className="w-full flex flex-col gap-1.5">
                         <Label className="text-sm font-medium text-gray-400 pl-1">Product Title</Label>
                         <Input
                             name="title"
                             placeholder="e.g. Nike Air Jordan 1"
-                            required
                             className="w-full px-3 h-11 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
                         />
                     </TextField>
 
-                  
-                    <TextArea
-                        name="description"
-                        label="Description"
-                        placeholder="Describe your product..."
-                        className="w-full text-white"
-                        style={{ color: 'white', backgroundColor: '#171717' }}
-                    />
+                    <TextField isInvalid={!!errors.description} className="w-full flex flex-col gap-1.5">
+                        <Label className="text-sm font-medium text-gray-400 pl-1">Description</Label>
+                        <textarea
+                            name="description"
+                            placeholder="Describe your product..."
+                            className="w-full p-3 h-28 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all resize-none"
+                        />
+                        {errors.description && <p className="text-xs text-red-500 pl-1">{errors.description}</p>}
+                    </TextField>
 
-                    {/* ক্যাটাগরি সিলেক্ট (প্লেসহোল্ডার ফিক্সড) */}
-                    <Select selectedKey={selectedCategory} onSelectionChange={setSelectedCategory} name="category" placeholder="Select a category">
+                    <Select isInvalid={!!errors.category} errorMessage={errors.category} selectedKey={selectedCategory} onSelectionChange={setSelectedCategory} name="category" placeholder="Select a category">
                         <Label className="text-sm font-medium text-gray-400">Category</Label>
                         <SelectTrigger className="w-full bg-neutral-900 border border-neutral-800 p-3 rounded-xl text-white mt-1.5">
                             <SelectValue />
@@ -160,8 +213,7 @@ export function AddProductForm() {
                         </SelectPopover>
                     </Select>
 
-                  
-                    <Select selectedKey={selectedCondition} onSelectionChange={setSelectedCondition} name="condition" placeholder="Select condition">
+                    <Select isInvalid={!!errors.condition} errorMessage={errors.condition} selectedKey={selectedCondition} onSelectionChange={setSelectedCondition} name="condition" placeholder="Select condition">
                         <Label className="text-sm font-medium text-gray-400">Condition</Label>
                         <SelectTrigger className="w-full bg-neutral-900 border border-neutral-800 p-3 rounded-xl text-white mt-1.5">
                             <SelectValue />
@@ -176,30 +228,57 @@ export function AddProductForm() {
                         </SelectPopover>
                     </Select>
 
-                
                     <div className="grid grid-cols-2 gap-4">
-                        <TextField className="w-full flex flex-col gap-1.5">
+                        <TextField isInvalid={!!errors.price} errorMessage={errors.price} className="w-full flex flex-col gap-1.5">
                             <Label className="text-sm font-medium text-gray-400 pl-1">Price ($)</Label>
                             <Input
                                 name="price"
                                 type="number"
                                 placeholder="0.00"
-                                required
                                 className="w-full px-3 h-11 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
                             />
                         </TextField>
 
-                        <TextField className="w-full flex flex-col gap-1.5">
+                        <TextField isInvalid={!!errors.stock} errorMessage={errors.stock} className="w-full flex flex-col gap-1.5">
                             <Label className="text-sm font-medium text-gray-400 pl-1">Stock Quantity</Label>
                             <Input
                                 name="stock"
                                 type="number"
                                 placeholder="1"
-                                required
                                 className="w-full px-3 h-11 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
                             />
                         </TextField>
                     </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <TextField isInvalid={!!errors.country} errorMessage={errors.country} className="w-full flex flex-col gap-1.5">
+                            <Label className="text-sm font-medium text-gray-400 pl-1">Country</Label>
+                            <Input
+                                name="country"
+                                placeholder="e.g. Bangladesh"
+                                className="w-full px-3 h-11 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
+                            />
+                        </TextField>
+
+                        <TextField isInvalid={!!errors.phone} errorMessage={errors.phone} className="w-full flex flex-col gap-1.5">
+                            <Label className="text-sm font-medium text-gray-400 pl-1">Phone</Label>
+                            <Input
+                                name="phone"
+                                placeholder="e.g. +88017..."
+                                className="w-full px-3 h-11 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
+                            />
+                        </TextField>
+                    </div>
+
+                    <TextField isInvalid={!!errors.address} errorMessage={errors.address} className="w-full flex flex-col gap-1.5">
+                        <Label className="text-sm font-medium text-gray-400 pl-1">Address</Label>
+                        <Input
+                            name="address"
+                            placeholder="e.g. Mirpur, Dhaka"
+                            className="w-full px-3 h-11 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
+                        />
+                    </TextField>
+
                 </Fieldset>
 
                 <div className="flex justify-end gap-3 mt-4">

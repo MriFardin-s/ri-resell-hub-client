@@ -1,5 +1,5 @@
 'use client';
-import { AddProductForm } from "@/components/dashboard/AddProductForm"; // তোমার কম্পোনেন্টের সঠিক পাথ দাও
+import { AddProductForm } from "@/components/dashboard/AddProductForm"; 
 
 export default function NewProductPage() {
   return (
