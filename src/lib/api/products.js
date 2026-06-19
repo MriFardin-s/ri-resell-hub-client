@@ -1,13 +1,20 @@
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+// const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
+import { serverFetch } from "../core/server"
 
 
-export const getProducts = async (productId, status= "available") => {
+// export const getProducts = async (productId, status= "pending") => {
    
-        const res = await fetch(`${baseUrl}/api/products?productId=
-            ${productId}&status=${status}`
+//         const res = await fetch(`${baseUrl}/api/products?productId=${productId}&status=${status}`
+//         );
+//         return res.json();
 
-        );
-        return res.json({ success: false, message: 'Failed to fetch products' });
+//     }
 
-    }
+
+export const getProducts = async (sellerId, status = "pending") => {
+    return serverFetch(`/api/products?sellerId=${sellerId}&status=${status}`);
+}
+
+

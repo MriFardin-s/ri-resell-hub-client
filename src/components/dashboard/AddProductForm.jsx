@@ -9,7 +9,12 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation"; 
 import { addProduct } from '@/lib/actions/products';
 
-export function AddProductForm() {
+export function AddProductForm({ user }) {
+    //    console.log("Current Logged In User:", user);
+//     const [seller] = useState({
+//     id: "seller_md_6a3439e4", 
+//     name: "Rahman Book House ", 
+// });
     const router = useRouter();  
     const [previews, setPreviews] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -53,6 +58,7 @@ export function AddProductForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+     
         setIsLoading(true);
 
         const formData = new FormData(e.currentTarget);
@@ -113,13 +119,14 @@ export function AddProductForm() {
                 ...rawData,
                 category: categoryValue,
                 condition: conditionValue,
+                sellerId: user?._id || user?.id,
                 price: Number(rawData.price),
                 stock: Number(rawData.stock),
-                status: "available",
+                status: "pending",
                 images: imageUrls
             };
 
-            console.log("Submitting product data:", newProductData);
+            // console.log("Submitting product data:", newProductData);
 
             const res = await addProduct(newProductData);
 
