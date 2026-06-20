@@ -7,19 +7,18 @@ export const ProductCard = ({ product }) => {
     return (
         <div className="w-full bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden h-full">
             <figure className="relative h-48 w-full bg-gray-50 overflow-hidden">
-               <div className="aspect-square w-full bg-gray-50 flex items-center justify-center overflow-hidden rounded-t-2xl p-2">
-    <img
-        src={product.images?.[0] || "https://placehold.co/600x400?text=No+Image"}
-        alt={product.title}
-        className="object-contain h-full w-full hover:scale-105 transition-transform duration-500"
-        loading="lazy"
-    />
-</div>
-                <span className={`absolute top-3 right-3 text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${
-                    product.condition === 'new' 
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                <div className="aspect-square w-full bg-gray-50 flex items-center justify-center overflow-hidden rounded-t-2xl p-2">
+                    <img
+                        src={product.images?.[0] || "https://placehold.co/600x400?text=No+Image"}
+                        alt={product.title}
+                        className="object-contain h-full w-full hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                    />
+                </div>
+                <span className={`absolute top-3 right-3 text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${product.condition === 'new'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                         : 'bg-amber-50 text-amber-700 border border-amber-200'
-                }`}>
+                    }`}>
                     {product.condition}
                 </span>
             </figure>
@@ -53,8 +52,8 @@ export const ProductCard = ({ product }) => {
                         </div>
                     </div>
 
-                    <Link 
-                        href={`/products/${productId}`} 
+                    <Link
+                        href={`/products/${productId}`}
                         className="w-full py-2.5 rounded-xl btn-theme-yellow text-center text-sm font-bold block"
                     >
                         Buy Now
