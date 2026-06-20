@@ -2,7 +2,6 @@
 import React from 'react';
 import StatCard from './StatCard';
 
-
 export default function StatsGrid({ statsData }) {
   if (!statsData || statsData.length === 0) return null;
 

@@ -30,69 +30,69 @@ export default function SellerProductsTable({ initialProducts }) {
 
     return (
         <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between gap-4 bg-amber-50/40 p-4 border border-amber-100 rounded-xl">
+            <div className="flex items-center justify-between gap-4 bg-amber-50/40 dark:bg-neutral-900/40 p-4 border border-amber-100 dark:border-neutral-800 rounded-xl transition-colors">
                 <input
                     type="text"
                     placeholder="Search by title or category..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full max-w-md px-4 h-10 rounded-xl bg-white border border-amber-200 text-gray-800 text-sm outline-none focus:border-yellow-500/50 transition-all shadow-sm placeholder:text-gray-400"
+                    className="w-full max-w-md px-4 h-10 rounded-xl bg-white dark:bg-neutral-800 border border-amber-200 dark:border-neutral-700 text-gray-800 dark:text-neutral-100 text-sm outline-none focus:border-theme-yellow-primary/50 transition-all shadow-sm placeholder:text-gray-400 dark:placeholder:text-neutral-500"
                 />
-                <span className="text-xs font-semibold text-gray-600 bg-white px-3 py-1.5 rounded-lg border border-amber-200 shadow-sm">
+                <span className="text-xs font-semibold text-gray-600 dark:text-neutral-300 bg-white dark:bg-neutral-800 px-3 py-1.5 rounded-lg border border-amber-200 dark:border-neutral-700 shadow-sm transition-colors">
                     Total: {filteredProducts.length} items
                 </span>
             </div>
 
-            <div className="border border-amber-100 rounded-2xl overflow-hidden bg-white shadow-sm">
+            <div className="border border-amber-100 dark:border-neutral-800 rounded-2xl overflow-hidden bg-white dark:bg-neutral-900 shadow-sm transition-colors">
                 <Table>
                     <Table.ScrollContainer>
-                        <Table.Content aria-label="Seller products management table" className="w-full bg-white text-neutral-900">
+                        <Table.Content aria-label="Seller products management table" className="w-full bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 transition-colors">
                             <Table.Header>
-                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500">Image</Table.Column>
-                                <Table.Column isRowHeader className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500">Product Name</Table.Column>
-                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500">Category</Table.Column>
-                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500">Condition</Table.Column>
-                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500">Price</Table.Column>
-                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500">Stock</Table.Column>
-                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500">Status</Table.Column>
-                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500">Actions</Table.Column>
+                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500 dark:text-neutral-400">Image</Table.Column>
+                                <Table.Column isRowHeader className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500 dark:text-neutral-400">Product Name</Table.Column>
+                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500 dark:text-neutral-400">Category</Table.Column>
+                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500 dark:text-neutral-400">Condition</Table.Column>
+                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500 dark:text-neutral-400">Price</Table.Column>
+                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500 dark:text-neutral-400">Stock</Table.Column>
+                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500 dark:text-neutral-400">Status</Table.Column>
+                                <Table.Column className="p-4 text-xs font-bold text-center uppercase tracking-wider text-gray-500 dark:text-neutral-400">Actions</Table.Column>
                             </Table.Header>
                             <Table.Body emptyContent="No products found.">
                                 {filteredProducts.map((product) => {
                                     const id = product._id?.$oid || product._id;
                                     return (
-                                        <Table.Row key={id} className="border-b border-amber-50 bg-white hover:bg-yellow-50/30 transition-colors">
+                                        <Table.Row key={id} className="border-b border-amber-5 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:bg-yellow-50/30 dark:hover:bg-neutral-800/50 transition-colors">
                                             <Table.Cell className="p-4 text-center">
                                                 <img 
                                                     src={product.images?.[0] || 'https://placehold.co/50'} 
                                                     alt={product.title} 
-                                                    className="w-12 h-12 object-cover rounded-xl border border-neutral-200 shadow-sm mx-auto"
+                                                    className="w-12 h-12 object-cover rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm mx-auto"
                                                 />
                                             </Table.Cell>
                                             <Table.Cell className="p-4 text-center max-w-[200px] truncate">
-                                                <div className="font-bold text-gray-900 text-sm tracking-tight">{product.title}</div>
-                                                <div className="text-[11px] text-gray-400 font-mono mt-0.5">{id}</div>
+                                                <div className="font-bold text-gray-900 dark:text-neutral-100 text-sm tracking-tight">{product.title}</div>
+                                                <div className="text-[11px] text-gray-400 dark:text-neutral-500 font-mono mt-0.5">{id}</div>
                                             </Table.Cell>
-                                            <Table.Cell className="p-4 text-center text-sm font-semibold text-gray-600 capitalize">
+                                            <Table.Cell className="p-4 text-center text-sm font-semibold text-gray-600 dark:text-neutral-300 capitalize">
                                                 {product.category}
                                             </Table.Cell>
                                             <Table.Cell className="p-4 text-center text-sm">
                                                 <span className={`px-2.5 py-1 text-xs rounded-lg font-bold tracking-wide inline-block ${
                                                     product.condition === 'new' 
-                                                        ? 'bg-green-50 text-green-700 border border-green-200' 
-                                                        : 'bg-orange-50 text-orange-700 border border-orange-200'
+                                                        ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/50' 
+                                                        : 'bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/50'
                                                 }`}>
                                                     {product.condition}
                                                 </span>
                                             </Table.Cell>
-                                            <Table.Cell className="p-4 text-center text-sm font-extrabold text-gray-900">
+                                            <Table.Cell className="p-4 text-center text-sm font-extrabold text-gray-900 dark:text-neutral-100">
                                                 ${product.price?.toLocaleString()}
                                             </Table.Cell>
-                                            <Table.Cell className="p-4 text-center text-sm font-bold text-gray-700 font-mono">
+                                            <Table.Cell className="p-4 text-center text-sm font-bold text-gray-700 dark:text-neutral-300 font-mono">
                                                 {product.stock}
                                             </Table.Cell>
                                             <Table.Cell className="p-4 text-center text-sm">
-                                                <span className="text-xs font-bold text-yellow-700 bg-yellow-50 px-2.5 py-1 border border-yellow-200 rounded-full inline-block">
+                                                <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/40 px-2.5 py-1 border border-yellow-200 dark:border-yellow-900/50 rounded-full inline-block">
                                                     {product.status}
                                                 </span>
                                             </Table.Cell>
@@ -100,21 +100,21 @@ export default function SellerProductsTable({ initialProducts }) {
                                                 <div className="flex justify-center gap-2">
                                                     <button 
                                                         type="button"
-                                                        className="px-3 py-1.5 text-xs font-bold bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 text-gray-700 transition-all"
+                                                        className="px-3 py-1.5 text-xs font-bold bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-700 dark:text-neutral-300 transition-all"
                                                     >
                                                         <Eye/> 
                                                     </button>
                                                     <button 
                                                         type="button"
                                                         onClick={() => handleEdit(product)}
-                                                        className="px-3 py-1.5 text-xs font-bold bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 text-gray-700 transition-all"
+                                                        className="px-3 py-1.5 text-xs font-bold bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-700 dark:text-neutral-300 transition-all"
                                                     >
                                                         <Pencil/> 
                                                     </button>
                                                     <button 
                                                         type="button"
                                                         onClick={() => handleDelete(id)}
-                                                        className="px-3 py-1.5 text-xs font-bold bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 text-red-600 transition-all"
+                                                        className="px-3 py-1.5 text-xs font-bold bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/50 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 transition-all"
                                                     >
                                                         <TrashBin/> 
                                                     </button>

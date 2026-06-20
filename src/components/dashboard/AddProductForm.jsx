@@ -10,11 +10,6 @@ import { useRouter } from "next/navigation";
 import { addProduct } from '@/lib/actions/products';
 
 export function AddProductForm({ user }) {
-    //    console.log("Current Logged In User:", user);
-    //     const [seller] = useState({
-    //     id: "seller_md_6a3439e4", 
-    //     name: "Rahman Book House ", 
-    // });
     const router = useRouter();
     const [previews, setPreviews] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +53,6 @@ export function AddProductForm({ user }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         setIsLoading(true);
 
         const formData = new FormData(e.currentTarget);
@@ -119,24 +113,17 @@ export function AddProductForm({ user }) {
                 ...rawData,
                 category: categoryValue,
                 condition: conditionValue,
-
-               
                 sellerInfo: {
                     userId: user?._id || user?.id,
                     name: user?.name,
                     email: user?.email,
                     phone: rawData.phone 
                 },
-
                 price: Number(rawData.price),
                 stock: Number(rawData.stock),
                 status: "pending",
                 images: imageUrls
             };
-
-            
-
-            // console.log("Submitting product data:", newProductData);
 
             const res = await addProduct(newProductData);
 
@@ -157,28 +144,30 @@ export function AddProductForm({ user }) {
             setIsLoading(false);
         }
     };
+
     return (
-        <div className="max-w-2xl mx-auto p-6 bg-neutral-950 border border-neutral-900 rounded-2xl">
-            <h2 className="text-xl font-black text-white mb-6">ADD NEW PRODUCT</h2>
+        <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-900 rounded-2xl shadow-sm dark:shadow-none transition-colors">
+            <h2 className="text-xl font-black text-neutral-900 dark:text-white mb-6">ADD NEW PRODUCT</h2>
 
             <Form onSubmit={handleSubmit} className="flex flex-col gap-6" validationErrors={errors} validationBehavior='aria'>
                 <Fieldset className="flex flex-col gap-5">
 
+                    {/* Image Upload Row */}
                     <div className="flex flex-col gap-4">
-                        <Label className="text-sm font-medium text-gray-400">Product Images (Upload up to 3)</Label>
+                        <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400">Product Images (Upload up to 3)</Label>
                         <input
                             type="file"
                             multiple
                             accept="image/*"
                             onChange={handleImageChange}
-                            className={`w-full p-3 rounded-xl bg-neutral-900 border text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-yellow-400 file:text-black hover:file:bg-yellow-500 cursor-pointer ${errors.images ? 'border-red-500' : 'border-neutral-800'}`}
+                            className={`w-full p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 border text-neutral-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-yellow-400 file:text-black hover:file:bg-yellow-500 cursor-pointer transition-colors ${errors.images ? 'border-red-500' : 'border-neutral-200 dark:border-neutral-800'}`}
                         />
                         {errors.images && <p className="text-xs text-red-500 pl-1">{errors.images}</p>}
 
                         <div className="flex gap-2 mt-2">
                             {previews.map((img) => (
                                 <div key={img.id} className="relative w-20 h-20">
-                                    <img src={img.url} alt="preview" className="w-full h-full object-cover rounded-lg border border-neutral-800" />
+                                    <img src={img.url} alt="preview" className="w-full h-full object-cover rounded-lg border border-neutral-200 dark:border-neutral-800" />
                                     <button
                                         type="button"
                                         onClick={() => removeImage(img.id)}
@@ -191,116 +180,124 @@ export function AddProductForm({ user }) {
                         </div>
                     </div>
 
+                    {/* Product Title */}
                     <TextField isInvalid={!!errors.title} errorMessage={errors.title} className="w-full flex flex-col gap-1.5">
-                        <Label className="text-sm font-medium text-gray-400 pl-1">Product Title</Label>
+                        <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400 pl-1">Product Title</Label>
                         <Input
                             name="title"
                             placeholder="e.g. Nike Air Jordan 1"
-                            className="w-full px-3 h-11 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
+                            className="w-full px-3 h-11 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
                         />
                     </TextField>
 
+                    {/* Description */}
                     <TextField isInvalid={!!errors.description} className="w-full flex flex-col gap-1.5">
-                        <Label className="text-sm font-medium text-gray-400 pl-1">Description</Label>
+                        <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400 pl-1">Description</Label>
                         <textarea
                             name="description"
                             placeholder="Describe your product..."
-                            className="w-full p-3 h-28 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all resize-none"
+                            className="w-full p-3 h-28 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all resize-none"
                         />
                         {errors.description && <p className="text-xs text-red-500 pl-1">{errors.description}</p>}
                     </TextField>
 
+                    {/* Category */}
                     <Select isInvalid={!!errors.category} errorMessage={errors.category} selectedKey={selectedCategory} onSelectionChange={setSelectedCategory} name="category" placeholder="Select a category">
-                        <Label className="text-sm font-medium text-gray-400">Category</Label>
-                        <SelectTrigger className="w-full bg-neutral-900 border border-neutral-800 p-3 rounded-xl text-white mt-1.5">
+                        <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400">Category</Label>
+                        <SelectTrigger className="w-full bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-3 rounded-xl text-neutral-900 dark:text-white mt-1.5 transition-colors">
                             <SelectValue />
                             <SelectIndicator />
                         </SelectTrigger>
-                        <SelectPopover className="bg-neutral-950 border border-neutral-800 w-[var(--trigger-width)] rounded-xl mt-1">
+                        <SelectPopover className="bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 w-[var(--trigger-width)] rounded-xl mt-1">
                             <ListBox className="p-2 space-y-1">
-                                <ListBoxItem id="electronics" className="p-3 text-white hover:bg-neutral-800 rounded-lg cursor-pointer">Electronics</ListBoxItem>
-                                <ListBoxItem id="phones" className="p-3 text-white hover:bg-neutral-800 rounded-lg cursor-pointer">Phones</ListBoxItem>
-                                <ListBoxItem id="vehicles" className="p-3 text-white hover:bg-neutral-800 rounded-lg cursor-pointer">Vehicles</ListBoxItem>
-                                <ListBoxItem id="furniture" className="p-3 text-white hover:bg-neutral-800 rounded-lg cursor-pointer">Furniture</ListBoxItem>
-                                <ListBoxItem id="books" className="p-3 text-white hover:bg-neutral-800 rounded-lg cursor-pointer">Books</ListBoxItem>
-                                <ListBoxItem id="cameras" className="p-3 text-white hover:bg-neutral-800 rounded-lg cursor-pointer">Cameras</ListBoxItem>
-                                <ListBoxItem id="fashion" className="p-3 text-white hover:bg-neutral-800 rounded-lg cursor-pointer">Fashion</ListBoxItem>
-                                <ListBoxItem id="home" className="p-3 text-white hover:bg-neutral-800 rounded-lg cursor-pointer">Home & Living</ListBoxItem>
+                                <ListBoxItem id="electronics" className="p-3 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer">Electronics</ListBoxItem>
+                                <ListBoxItem id="phones" className="p-3 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer">Phones</ListBoxItem>
+                                <ListBoxItem id="vehicles" className="p-3 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer">Vehicles</ListBoxItem>
+                                <ListBoxItem id="furniture" className="p-3 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer">Furniture</ListBoxItem>
+                                <ListBoxItem id="books" className="p-3 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer">Books</ListBoxItem>
+                                <ListBoxItem id="cameras" className="p-3 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer">Cameras</ListBoxItem>
+                                <ListBoxItem id="fashion" className="p-3 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer">Fashion</ListBoxItem>
+                                <ListBoxItem id="home" className="p-3 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer">Home & Living</ListBoxItem>
                             </ListBox>
                         </SelectPopover>
                     </Select>
 
+                    {/* Condition */}
                     <Select isInvalid={!!errors.condition} errorMessage={errors.condition} selectedKey={selectedCondition} onSelectionChange={setSelectedCondition} name="condition" placeholder="Select condition">
-                        <Label className="text-sm font-medium text-gray-400">Condition</Label>
-                        <SelectTrigger className="w-full bg-neutral-900 border border-neutral-800 p-3 rounded-xl text-white mt-1.5">
+                        <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400">Condition</Label>
+                        <SelectTrigger className="w-full bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-3 rounded-xl text-neutral-900 dark:text-white mt-1.5 transition-colors">
                             <SelectValue />
                             <SelectIndicator />
                         </SelectTrigger>
-                        <SelectPopover className="bg-neutral-950 border border-neutral-800 w-[var(--trigger-width)] rounded-xl mt-1">
+                        <SelectPopover className="bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 w-[var(--trigger-width)] rounded-xl mt-1">
                             <ListBox className="p-2 space-y-1">
-                                <ListBoxItem id="used" className="p-3 text-white hover:bg-neutral-800 rounded-lg cursor-pointer">Used</ListBoxItem>
-                                <ListBoxItem id="like-new" className="p-3 text-white hover:bg-neutral-800 rounded-lg cursor-pointer">Like New</ListBoxItem>
-                                <ListBoxItem id="refurbished" className="p-3 text-white hover:bg-neutral-800 rounded-lg cursor-pointer">Refurbished</ListBoxItem>
+                                <ListBoxItem id="used" className="p-3 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer">Used</ListBoxItem>
+                                <ListBoxItem id="like-new" className="p-3 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer">Like New</ListBoxItem>
+                                <ListBoxItem id="refurbished" className="p-3 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer">Refurbished</ListBoxItem>
                             </ListBox>
                         </SelectPopover>
                     </Select>
 
+                    {/* Price and Stock */}
                     <div className="grid grid-cols-2 gap-4">
                         <TextField isInvalid={!!errors.price} errorMessage={errors.price} className="w-full flex flex-col gap-1.5">
-                            <Label className="text-sm font-medium text-gray-400 pl-1">Price ($)</Label>
+                            <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400 pl-1">Price ($)</Label>
                             <Input
                                 name="price"
                                 type="number"
                                 placeholder="0.00"
-                                className="w-full px-3 h-11 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
+                                className="w-full px-3 h-11 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
                             />
                         </TextField>
 
                         <TextField isInvalid={!!errors.stock} errorMessage={errors.stock} className="w-full flex flex-col gap-1.5">
-                            <Label className="text-sm font-medium text-gray-400 pl-1">Stock Quantity</Label>
+                            <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400 pl-1">Stock Quantity</Label>
                             <Input
                                 name="stock"
                                 type="number"
                                 placeholder="1"
-                                className="w-full px-3 h-11 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
+                                className="w-full px-3 h-11 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
                             />
                         </TextField>
                     </div>
 
+                    {/* Country and Phone */}
                     <div className="grid grid-cols-2 gap-4">
                         <TextField isInvalid={!!errors.country} errorMessage={errors.country} className="w-full flex flex-col gap-1.5">
-                            <Label className="text-sm font-medium text-gray-400 pl-1">Country</Label>
+                            <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400 pl-1">Country</Label>
                             <Input
                                 name="country"
                                 placeholder="e.g. Bangladesh"
-                                className="w-full px-3 h-11 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
+                                className="w-full px-3 h-11 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
                             />
                         </TextField>
 
                         <TextField isInvalid={!!errors.phone} errorMessage={errors.phone} className="w-full flex flex-col gap-1.5">
-                            <Label className="text-sm font-medium text-gray-400 pl-1">Phone</Label>
+                            <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400 pl-1">Phone</Label>
                             <Input
                                 name="phone"
                                 placeholder="e.g. +88017..."
-                                className="w-full px-3 h-11 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
+                                className="w-full px-3 h-11 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
                             />
                         </TextField>
                     </div>
 
+                    {/* Address */}
                     <TextField isInvalid={!!errors.address} errorMessage={errors.address} className="w-full flex flex-col gap-1.5">
-                        <Label className="text-sm font-medium text-gray-400 pl-1">Address</Label>
+                        <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400 pl-1">Address</Label>
                         <Input
                             name="address"
                             placeholder="e.g. Mirpur, Dhaka"
-                            className="w-full px-3 h-11 rounded-xl bg-neutral-900 border border-neutral-800 text-white placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
+                            className="w-full px-3 h-11 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all"
                         />
                     </TextField>
 
                 </Fieldset>
 
+                {/* Form Actions */}
                 <div className="flex justify-end gap-3 mt-4">
-                    <Button variant="flat" className="text-gray-400">Cancel</Button>
-                    <Button type="submit" isLoading={isLoading} className="bg-yellow-400 text-black font-bold">Create Product</Button>
+                    <Button variant="flat" className="text-neutral-500 dark:text-gray-400 bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors">Cancel</Button>
+                    <Button type="submit" isLoading={isLoading} className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold transition-colors">Create Product</Button>
                 </div>
             </Form>
         </div>

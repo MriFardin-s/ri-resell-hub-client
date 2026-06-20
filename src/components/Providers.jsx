@@ -1,4 +1,5 @@
 'use client';
+
 import { Toaster } from 'react-hot-toast';
 
 export default function Providers({ children }) {
@@ -9,19 +10,12 @@ export default function Providers({ children }) {
                 position="top-center" 
                 reverseOrder={false} 
                 toastOptions={{
-                    style: {
-                        background: '#ffffff',
-                        color: 'var(--theme-text-dark)',
-                        border: '1px solid #f3f4f6',
-                        borderRadius: '12px',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        fontFamily: '__Inter_aaf875, __Inter_Fallback_aaf875, sans-serif',
-                        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05)',
-                        padding: '12px 20px',
-                    },
+                   
+                    className: 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 border border-gray-100 dark:border-neutral-800 rounded-xl text-sm font-semibold shadow-xl px-5 py-3 font-sans transition-colors duration-300',
+                    
                     success: {
                         iconTheme: {
+                          
                             primary: 'var(--theme-yellow-hover)',
                             secondary: '#ffffff',
                         },

@@ -39,19 +39,23 @@ const SellerHomePage = () => {
   const user = session?.user;
 
   return (
-    <div className="min-h-screen text-gray-800 p-6 lg:p-10 space-y-8 relative overflow-hidden">
+    <div className="min-h-screen text-neutral-900 dark:text-neutral-100 p-6 lg:p-10 space-y-8 relative overflow-hidden transition-colors">
+      {/* Background Radial Gradient */}
       <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(250,204,21,0.08),transparent_60%)] pointer-events-none" />
 
+      {/* Welcome Header */}
       <div className="space-y-2 relative z-10">
-        <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-gray-900">
-          Welcome, <span className="text-yellow-600">{user?.name}</span>!
+        <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-neutral-900 dark:text-white">
+          Welcome, <span className="text-yellow-600 dark:text-yellow-400">{user?.name}</span>!
         </h1>
-        <p className="text-xs lg:text-sm text-gray-500 font-semibold tracking-wide uppercase">
+        <p className="text-xs lg:text-sm text-neutral-500 dark:text-neutral-400 font-semibold tracking-wide uppercase">
           Resell Hub Smart Dashboard Overview
         </p>
       </div>
 
+
       <div className="relative z-10">
+        
         <StatsGrid statsData={sellerStats} />
       </div>
     </div>
