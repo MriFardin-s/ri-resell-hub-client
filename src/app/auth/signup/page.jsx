@@ -11,14 +11,7 @@ export default function SignUp() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [country, setCountry] = useState('');
-  const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState('buyer');
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -55,8 +48,12 @@ export default function SignUp() {
     setError('');
     setSuccess('');
 
+    const formData = new FormData(e.currentTarget);
+    const { name, email, password, country, address, phone, role } = Object.fromEntries(formData.entries());
+
+    // Password Validation Check
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-    if (!passwordRegex.test(password)) {
+    if (!password || !passwordRegex.test(password)) {
       setError('Password must be at least 8 characters long, contain at least one capital letter, and one number.');
       setIsLoading(false);
       return;
@@ -66,14 +63,14 @@ export default function SignUp() {
       let imageUrl = '';
 
       if (imageFile) {
-        const formData = new FormData();
-        formData.append('image', imageFile);
+        const imgFormData = new FormData();
+        imgFormData.append('image', imageFile);
 
         const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 
         const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
           method: 'POST',
-          body: formData,
+          body: imgFormData,
         });
 
         const imgData = await response.json();
@@ -87,16 +84,17 @@ export default function SignUp() {
         }
       }
 
+      // Better Auth Submission
       const { data, error: authError } = await signUp.email({
-        email,
-        password,
-        role,
-        name,
+        email: email,
+        password: password,
+        name: name,
         image: imageUrl,
-        country,
-        address,
-        phone,
         callbackURL: callbackUrl, 
+        role: role || 'buyer',
+        country: country,
+        address: address,
+        phone: phone
       });
 
       if (authError) {
@@ -134,10 +132,8 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center p-4 relative overflow-hidden transition-colors">
-      {/* Background Gradient */}
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(250,204,21,0.07),transparent_50%)]" />
 
-      {/* Back Button */}
       <div className="absolute top-6 left-4 sm:left-8 z-10">
         <Link href="/" className="inline-flex items-center space-x-2 text-neutral-500 hover:text-yellow-500 dark:text-gray-400 dark:hover:text-yellow-400 font-medium transition text-sm">
           <ChevronLeft className="w-4 h-4" />
@@ -145,7 +141,6 @@ export default function SignUp() {
         </Link>
       </div>
 
-      {/* Main Form Card */}
       <Card className="w-full max-w-md bg-white/90 dark:bg-neutral-800/80 backdrop-blur-md border border-neutral-200 dark:border-neutral-700/50 shadow-2xl p-6 rounded-2xl relative z-10 text-neutral-900 dark:text-white transition-colors my-12">
         <Card.Header className="flex flex-col space-y-2 text-center p-0 mb-6">
           <Card.Title className="text-2xl font-black tracking-wider text-neutral-900 dark:text-white">
@@ -157,22 +152,8 @@ export default function SignUp() {
         </Card.Header>
 
         <Card.Content className="p-0 space-y-4">
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 flex items-start space-x-2.5 text-red-600 dark:text-red-400 text-xs">
-              <TriangleExclamation className="w-4 h-4 mt-0.5 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {success && (
-            <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-3 flex items-start space-x-2.5 text-green-600 dark:text-green-400 text-xs">
-              <CircleCheck className="w-4 h-4 mt-0.5 shrink-0" />
-              <span>{success}</span>
-            </div>
-          )}
-
           <Form onSubmit={handleSignUp} className="space-y-4 w-full">
-            {/* Profile Picture Upload */}
+            {/* Profile Picture */}
             <div className="flex flex-col items-center justify-center space-y-2 w-full">
               <label className="relative group cursor-pointer flex flex-col items-center justify-center w-20 h-20 rounded-full border-2 border-dashed border-neutral-300 dark:border-neutral-600 hover:border-yellow-400 overflow-hidden transition bg-neutral-100 dark:bg-neutral-900/50">
                 {imagePreview ? (
@@ -188,16 +169,13 @@ export default function SignUp() {
             </div>
 
             {/* Full Name */}
-            <TextField className="w-full space-y-1">
+            <TextField name="name" type="text" required className="w-full space-y-1">
               <Label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Full Name</Label>
               <div className="relative">
                 <Person className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-gray-500 w-4 h-4" />
                 <Input
-                  type="text"
+                  name="name"
                   placeholder="Enter your full name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
                   className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 hover:border-yellow-400/50 focus:border-yellow-400 transition-colors h-11 rounded-xl text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-gray-500 text-sm pl-11 pr-4 w-full outline-none"
                 />
               </div>
@@ -205,17 +183,14 @@ export default function SignUp() {
               <FieldError />
             </TextField>
 
-            {/* Email Address */}
-            <TextField className="w-full space-y-1">
+            {/* Email */}
+            <TextField name="email" type="email" required className="w-full space-y-1">
               <Label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Email Address</Label>
               <div className="relative">
                 <Envelope className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-gray-500 w-4 h-4" />
                 <Input
-                  type="email"
+                  name="email"
                   placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
                   className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 hover:border-yellow-400/50 focus:border-yellow-400 transition-colors h-11 rounded-xl text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-gray-500 text-sm pl-11 pr-4 w-full outline-none"
                 />
               </div>
@@ -223,11 +198,11 @@ export default function SignUp() {
               <FieldError />
             </TextField>
 
-            {/* Country Select */}
-            <Select label="Country" selectedKey={country} onSelectionChange={setCountry} className="w-full" placeholder="Select your country">
+            {/* Country */}
+            <Select name="country" label="Country" className="w-full" placeholder="Select your country">
               <Label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Country</Label>
               <SelectTrigger className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 h-11 rounded-xl text-neutral-900 dark:text-white">
-                <SelectValue  />
+                <SelectValue />
               </SelectTrigger>
               <SelectPopover className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 w-[var(--trigger-width)] rounded-xl mt-1 p-1 shadow-xl">
                 <ListBox>
@@ -239,38 +214,35 @@ export default function SignUp() {
               </SelectPopover>
             </Select>
 
-            {/* Address Text Field */}
-            <TextField className="w-full space-y-1">
+            {/* Address */}
+            <TextField name="address" className="w-full space-y-1">
               <Label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Address</Label>
               <Input
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                name="address"
                 placeholder="Enter your street address"
                 className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 h-11 rounded-xl text-neutral-900 dark:text-white text-sm px-4 w-full outline-none"
               />
             </TextField>
 
-            {/* Phone Number with Country Code */}
-            <div className="flex flex-col gap-1 w-full">
+            {/* Phone */}
+            <TextField name="phone" type="tel" className="flex flex-col gap-1 w-full">
               <Label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Phone Number</Label>
               <div className="flex items-center bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl overflow-hidden focus-within:border-yellow-400 transition-all h-11">
                 <span className="px-3 text-neutral-500 dark:text-gray-400 border-r border-neutral-200 dark:border-neutral-700 bg-neutral-200 dark:bg-neutral-800/50 h-full flex items-center text-sm">
                   +880
                 </span>
-                <input
-                  type="tel"
+                <Input
+                  name="phone"
                   placeholder="17XXXXXXXX"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
                   className="bg-transparent text-neutral-900 dark:text-white text-sm px-4 w-full h-full outline-none placeholder:text-neutral-400 dark:placeholder:text-gray-600"
                 />
               </div>
-            </div>
+            </TextField>
 
-            {/* Role Selection */}
+            {/* Role */}
             <div className="flex flex-col gap-2">
               <Label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Role</Label>
-              <RadioGroup value={role} onValueChange={setRole} orientation="horizontal" className="flex flex-row space-x-6">
+              <RadioGroup name="role" defaultValue="buyer" orientation="horizontal" className="flex flex-row space-x-6">
                 <Radio value="buyer">
                   <Radio.Content className="flex items-center gap-2">
                     <Radio.Control>
@@ -295,17 +267,14 @@ export default function SignUp() {
               </RadioGroup>
             </div>
 
-            {/* Password Field */}
-            <TextField className="w-full space-y-1">
+            {/* Password */}
+            <TextField name="password" type={showPassword ? "text" : "password"} required className="w-full space-y-1">
               <Label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Password</Label>
               <div className="relative">
                 <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-gray-500 w-4 h-4" />
                 <Input
-                  type={showPassword ? "text" : "password"}
+                  name="password"
                   placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
                   className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 hover:border-yellow-400/50 focus:border-yellow-400 transition-colors h-11 rounded-xl text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-gray-500 text-sm pl-11 pr-12 w-full outline-none"
                 />
 
@@ -314,11 +283,7 @@ export default function SignUp() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-2 top-1/2 -translate-y-1/2 bg-neutral-200 hover:bg-neutral-300 dark:bg-white dark:hover:bg-yellow-400 text-neutral-900 p-1.5 rounded-lg transition-colors focus:outline-none shadow-sm flex items-center justify-center"
                 >
-                  {showPassword ? (
-                    <EyeSlash className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
+                  {showPassword ? <EyeSlash className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
 
@@ -329,6 +294,21 @@ export default function SignUp() {
               <FieldError />
             </TextField>
 
+            
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 flex items-start space-x-2.5 text-red-600 dark:text-red-400 text-xs my-2">
+                <TriangleExclamation className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {success && (
+              <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-3 flex items-start space-x-2.5 text-green-600 dark:text-green-400 text-xs my-2">
+                <CircleCheck className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{success}</span>
+              </div>
+            )}
+
             <Button
               type="submit"
               isLoading={isLoading}
@@ -338,7 +318,6 @@ export default function SignUp() {
             </Button>
           </Form>
 
-          {/* Divider */}
           <div className="relative flex items-center justify-center my-6">
             <div className="w-full border-t border-neutral-200 dark:border-neutral-700"></div>
             <span className="absolute bg-white dark:bg-neutral-800 px-3 text-[11px] text-neutral-400 dark:text-gray-500 uppercase font-semibold tracking-wider transition-colors">
@@ -346,7 +325,6 @@ export default function SignUp() {
             </span>
           </div>
 
-          {/* Google Sign Up */}
           <Button
             type="button"
             variant="bordered"
