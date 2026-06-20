@@ -36,21 +36,17 @@ const SellerHomePage = () => {
 
   const { data: session, isPending } = useSession();
 
-//   if (isPending) {
-//     return <PendingOverlay isPending={isPending} />;
-//   }
-
   const user = session?.user;
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white p-6 lg:p-10 space-y-8 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(250,204,21,0.02),transparent_50%)] pointer-events-none" />
+    <div className="min-h-screen text-gray-800 p-6 lg:p-10 space-y-8 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(250,204,21,0.08),transparent_60%)] pointer-events-none" />
 
       <div className="space-y-2 relative z-10">
-        <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-white">
-          Welcome, <span className="text-yellow-400">{user?.name }</span>!
+        <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-gray-900">
+          Welcome, <span className="text-yellow-600">{user?.name}</span>!
         </h1>
-        <p className="text-xs lg:text-sm text-gray-400 font-medium tracking-wide uppercase">
+        <p className="text-xs lg:text-sm text-gray-500 font-semibold tracking-wide uppercase">
           Resell Hub Smart Dashboard Overview
         </p>
       </div>

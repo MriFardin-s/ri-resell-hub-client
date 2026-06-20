@@ -17,4 +17,13 @@ export const getProducts = async (sellerId, status = "pending") => {
     return serverFetch(`/api/products?sellerId=${sellerId}&status=${status}`);
 }
 
+export const getAllProducts = async (status = 'pending') => {
+    return serverFetch(`/api/all/products?status=${status}`)
+}
+
+
+export const getAllProductsById = async (id) => {
+    return serverFetch(`/api/all/products/${id}`)
+}
+
 

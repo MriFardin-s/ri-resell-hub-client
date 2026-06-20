@@ -6,16 +6,16 @@ import {
     ListBox, ListBoxItem, Button
 } from "@heroui/react";
 import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 import { addProduct } from '@/lib/actions/products';
 
 export function AddProductForm({ user }) {
     //    console.log("Current Logged In User:", user);
-//     const [seller] = useState({
-//     id: "seller_md_6a3439e4", 
-//     name: "Rahman Book House ", 
-// });
-    const router = useRouter();  
+    //     const [seller] = useState({
+    //     id: "seller_md_6a3439e4", 
+    //     name: "Rahman Book House ", 
+    // });
+    const router = useRouter();
     const [previews, setPreviews] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("");
@@ -58,7 +58,7 @@ export function AddProductForm({ user }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-     
+
         setIsLoading(true);
 
         const formData = new FormData(e.currentTarget);
@@ -119,12 +119,22 @@ export function AddProductForm({ user }) {
                 ...rawData,
                 category: categoryValue,
                 condition: conditionValue,
-                sellerId: user?._id || user?.id,
+
+               
+                sellerInfo: {
+                    userId: user?._id || user?.id,
+                    name: user?.name,
+                    email: user?.email,
+                    phone: rawData.phone 
+                },
+
                 price: Number(rawData.price),
                 stock: Number(rawData.stock),
                 status: "pending",
                 images: imageUrls
             };
+
+            
 
             // console.log("Submitting product data:", newProductData);
 
@@ -146,7 +156,7 @@ export function AddProductForm({ user }) {
             toast.error("An unexpected error occurred.");
             setIsLoading(false);
         }
-    }; 
+    };
     return (
         <div className="max-w-2xl mx-auto p-6 bg-neutral-950 border border-neutral-900 rounded-2xl">
             <h2 className="text-xl font-black text-white mb-6">ADD NEW PRODUCT</h2>

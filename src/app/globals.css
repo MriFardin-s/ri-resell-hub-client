@@ -11,7 +11,7 @@
 
   body {
     color: var(--theme-text-dark);
-    background-color: #ffffff;
+    background-color: var(--theme-bg-light);
     font-family: '__Inter_aaf875', '__Inter_Fallback_aaf875', sans-serif; 
   }
 
@@ -75,7 +75,6 @@
     transform: translateX(100%);
   }
 }
-
 
 input::-ms-reveal,
 input::-ms-clear {
