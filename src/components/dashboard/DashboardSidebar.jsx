@@ -17,7 +17,7 @@ export async function  DashboardSidebar() {
 
   const buyerNavLinks = [
     { icon: House, href: "/dashboard/buyer", label: "Home" },
-    { icon: ShoppingBag, href: "/dashboard/buyer/orders", label: "My Orders" },
+    { icon: ShoppingBag, href: "/dashboard/buyer/my-orders", label: "My Orders" },
     { icon: Heart, href: "/dashboard/buyer/wishlist", label: "Wishlist" },
     { icon: CreditCard, href: "/dashboard/buyer/payments", label: "Payment History" },
     { icon: PersonFill, href: "/dashboard/buyer/profile", label: "Profile Settings" },
