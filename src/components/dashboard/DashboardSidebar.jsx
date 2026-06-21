@@ -1,15 +1,44 @@
-import { LayoutSideContentLeft, Bell, Envelope, Gear, House, Magnifier, Person, Plus, ChartMixed } from "@gravity-ui/icons";
+import { getUserSession } from "@/lib/core/session";
+import { LayoutSideContentLeft, Bell, Envelope, Gear, House, Magnifier, Person, Plus, ChartMixed, ShoppingBag, Heart, CreditCard, PersonFill, BroomMotion } from "@gravity-ui/icons";
 import { Button, Drawer } from "@heroui/react";
 import Link from "next/link";
 
-export function DashboardSidebar() {
-  const navItems = [
+export async function  DashboardSidebar() {
+
+  const user = await getUserSession()
+
+  const sellerNavLinks = [
     { icon: House, href: "/dashboard/seller", label: "Home" },
     { icon: Magnifier, href: "/dashboard/seller/products", label: "My Products" },
     { icon: Plus, href: "/dashboard/seller/products/new", label: "Add Product" },
     { icon: Envelope, href: "/dashboard/seller/orders", label: "Manage Orders" },
     { icon: ChartMixed, href: "/dashboard/seller/analytics", label: "Sales Analytics" },
+  ]
+
+  const buyerNavLinks = [
+    { icon: House, href: "/dashboard/buyer", label: "Home" },
+    { icon: ShoppingBag, href: "/dashboard/buyer/orders", label: "My Orders" },
+    { icon: Heart, href: "/dashboard/buyer/wishlist", label: "Wishlist" },
+    { icon: CreditCard, href: "/dashboard/buyer/payments", label: "Payment History" },
+    { icon: PersonFill, href: "/dashboard/buyer/profile", label: "Profile Settings" },
   ];
+
+  const adminNavLinks = [
+    { icon: House, href: "/dashboard/admin", label: "Home" },
+    { icon: PersonFill, href: "/dashboard/admin/users", label: "Manage Users" },
+    { icon: BroomMotion, href: "/dashboard/admin/products", label: "Manage Products" },
+    { icon: Envelope, href: "/dashboard/admin/orders", label: "Manage Orders" },
+    { icon: ChartMixed, href: "/dashboard/admin/analytics", label: "Platform Analytics" },
+  ];
+
+  const navLinksMap ={
+    buyer: buyerNavLinks,
+    seller: sellerNavLinks,
+    admin: adminNavLinks
+  }
+
+
+  const navItems = navLinksMap[user?.role || 'buyer'];
 
   const navContent = (
     <nav className="flex flex-col gap-1.5">
@@ -46,13 +75,13 @@ export function DashboardSidebar() {
           <Drawer.Content placement="left" className="bg-white dark:bg-neutral-900 border-r border-amber-200 dark:border-neutral-800 text-gray-900 dark:text-neutral-100 p-0 m-0 max-w-[280px] transition-colors">
             <Drawer.Dialog className="bg-white dark:bg-neutral-900 h-full flex flex-col focus:outline-none relative">
               <Drawer.CloseTrigger className="absolute top-4 right-4 text-gray-400 dark:text-neutral-500 hover:text-gray-900 dark:hover:text-neutral-100" />
-              
+
               <Drawer.Header className="border-b border-amber-100 dark:border-neutral-800 px-6 py-4">
                 <Drawer.Heading className="text-md font-black tracking-wider text-gray-900 dark:text-neutral-100">
                   RESELL <span className="text-theme-yellow-primary">HUB</span>
                 </Drawer.Heading>
               </Drawer.Header>
-              
+
               <Drawer.Body className="px-4 py-6 bg-white dark:bg-neutral-900 flex-1 overflow-y-auto">
                 {navContent}
               </Drawer.Body>

@@ -23,8 +23,19 @@ export default function Navbar() {
         { name: 'Home', href: '/' },
         { name: 'Products', href: '/products' },
         { name: 'Categories', href: '/categories' },
-        { name: 'Dashboard', href: '/dashboard' },
+        
+
     ];
+  const dashboardLink ={
+    buyer: '/dashboard/buyer',
+    seller:'/dashboard/seller',
+    admin: ''
+  }
+    if(user?.email){
+        navLinks.push(
+            { name: 'Dashboard', href: dashboardLink [user?.role || 'buyer']},
+        )
+    }
 
     const handleSignOut = async () => {
         try {
