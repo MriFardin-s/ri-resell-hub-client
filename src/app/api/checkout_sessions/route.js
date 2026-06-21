@@ -6,6 +6,7 @@ export async function POST(req) {
   try {
     const body = await req.json()
     const { product, buyer } = body
+  
 
     const headersList = await headers()
     const origin = headersList.get('origin')
@@ -30,10 +31,16 @@ export async function POST(req) {
       cancel_url: `${origin}/products/${product.id}`,
       metadata: {
         buyerId: buyer.id,
+        buyerName: buyer.name,
         buyerPhone: buyer.phone,
         buyerMail: buyer.email,
         buyerAddress: buyer.address,
-        productId: product.id
+        productId: product.id,
+
+        sellerId: product.sellerInfo?.userId,
+        sellerName: product.sellerInfo?.name,
+        sellerEmail: product.sellerInfo?.email,
+        sellerPhone: product.sellerInfo?.phone || 'Not Provided'
       }
     });
 

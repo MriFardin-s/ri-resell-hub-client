@@ -14,7 +14,7 @@ export default function ProductActions({ product, user }) {
 
     const isUserLoggedIn = user && user?.id;
     const isNotBuyer = isUserLoggedIn && user?.role !== 'buyer';
-    
+
 
     const isOutOfStock = product?.stock === undefined || product?.stock <= 0;
 
@@ -28,7 +28,7 @@ export default function ProductActions({ product, user }) {
                 icon: <LockFill className="w-5 h-5 text-red-500 dark:text-red-400" />,
                 ...toastConfig
             });
-            
+
             const currentPath = `/products/${id}`;
             router.push(`/auth/signin?callbackUrl=${encodeURIComponent(currentPath)}`);
             return;
@@ -52,7 +52,7 @@ export default function ProductActions({ product, user }) {
 
     const handleCheckoutSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!user?.address?.trim() || user?.address === 'Not Provided') {
             toast.error('Please update your profile with a valid delivery address first!', { ...toastConfig });
             return;
@@ -68,7 +68,8 @@ export default function ProductActions({ product, user }) {
                         id: product._id || id,
                         title: product.title,
                         price: product.price,
-                        image: product.images?.[0] || product.image
+                        image: product.images?.[0] || product.image,
+                        sellerInfo: product.sellerInfo
                     },
                     buyer: {
                         id: user.id,
@@ -110,8 +111,8 @@ export default function ProductActions({ product, user }) {
         }
 
         try {
-            const endpoint = isWishlisted 
-                ? `/api/wishlist/remove` 
+            const endpoint = isWishlisted
+                ? `/api/wishlist/remove`
                 : `/api/wishlist/add`;
 
             const response = await fetch(endpoint, {
@@ -131,12 +132,12 @@ export default function ProductActions({ product, user }) {
 
             setIsWishlisted(!isWishlisted);
             if (!isWishlisted) {
-                toast.success('Added to wishlist!', { 
+                toast.success('Added to wishlist!', {
                     icon: '❤️',
                     ...toastConfig
                 });
             } else {
-                toast('Removed from wishlist', { 
+                toast('Removed from wishlist', {
                     icon: '🗑️',
                     ...toastConfig
                 });
@@ -165,8 +166,8 @@ export default function ProductActions({ product, user }) {
                     onClick={handleOrderNow}
                     disabled={isButtonDisabled}
                     className={`flex-1 h-14 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all duration-300 
-                        ${isButtonDisabled 
-                            ? 'bg-gray-200 dark:bg-neutral-800 text-gray-400 dark:text-neutral-600 cursor-not-allowed shadow-none' 
+                        ${isButtonDisabled
+                            ? 'bg-gray-200 dark:bg-neutral-800 text-gray-400 dark:text-neutral-600 cursor-not-allowed shadow-none'
                             : 'bg-theme-yellow-primary hover:bg-theme-yellow-hover text-gray-900 shadow-lg shadow-theme-yellow-primary/20 active:scale-[0.98]'
                         }`}
                 >
@@ -179,8 +180,8 @@ export default function ProductActions({ product, user }) {
                     onClick={handleWishlist}
                     disabled={isNotBuyer}
                     className={`w-14 h-14 rounded-2xl border flex items-center justify-center active:scale-[0.98] transition-all duration-200 shadow-sm 
-                        ${isNotBuyer 
-                            ? 'bg-gray-50 dark:bg-neutral-900/50 border-gray-200 dark:border-neutral-800 text-gray-300 dark:text-neutral-700 cursor-not-allowed' 
+                        ${isNotBuyer
+                            ? 'bg-gray-50 dark:bg-neutral-900/50 border-gray-200 dark:border-neutral-800 text-gray-300 dark:text-neutral-700 cursor-not-allowed'
                             : isWishlisted
                                 ? 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900/50 text-red-500 dark:text-red-400'
                                 : 'bg-white dark:bg-neutral-900 border-amber-200 dark:border-neutral-800 text-gray-400 dark:text-neutral-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50/50 dark:hover:bg-red-950/20'
@@ -194,7 +195,7 @@ export default function ProductActions({ product, user }) {
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
                     <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-gray-100 dark:border-neutral-800 text-gray-900 dark:text-white">
                         <h3 className="text-xl font-bold mb-4">Confirm Order Details</h3>
-                        
+
                         <form onSubmit={handleCheckoutSubmit} className="space-y-4">
                             <div>
                                 <label className="block text-xs font-semibold text-gray-400 uppercase">Buyer Name</label>

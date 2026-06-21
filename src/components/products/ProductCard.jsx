@@ -22,11 +22,10 @@ export const ProductCard = ({ product }) => {
                         loading="lazy"
                     />
                 </div>
-                <span className={`absolute top-3 right-3 text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${
-                    product.condition === 'new'
+                <span className={`absolute top-3 right-3 text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${product.condition === 'new'
                         ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40'
                         : 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40'
-                }`}>
+                    }`}>
                     {product.condition}
                 </span>
             </figure>
@@ -60,12 +59,23 @@ export const ProductCard = ({ product }) => {
                         </div>
                     </div>
 
-                    <Link
-                        href={`/products/${productId}`}
-                        className="w-full py-2.5 rounded-xl btn-theme-yellow text-center text-sm font-bold block"
-                    >
-                        View Details
-                    </Link>
+                    {product?.stock === 0 || product?.status === "sold" ? (
+                        
+                        <button
+                            disabled
+                            className="w-full py-2.5 rounded-xl bg-neutral-300 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 font-bold text-center text-sm block cursor-not-allowed"
+                        >
+                            Sold Out
+                        </button>
+                    ) : (
+                        
+                        <Link
+                            href={`/products/${productId}`}
+                            className="w-full py-2.5 rounded-xl btn-theme-yellow text-center text-sm font-bold block"
+                        >
+                            View Details
+                        </Link>
+                    )}
                 </div>
             </div>
         </motion.div>
