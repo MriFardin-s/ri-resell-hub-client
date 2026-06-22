@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 
 export const ProductCard = ({ product }) => {
     const productId = product._id?.$oid || product._id;
+    const isOutOfStock = product?.stock === 0 || product?.status === "sold";
 
     return (
         <motion.div
@@ -22,12 +23,28 @@ export const ProductCard = ({ product }) => {
                         loading="lazy"
                     />
                 </div>
-                <span className={`absolute top-3 right-3 text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${product.condition === 'new'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40'
-                        : 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40'
+
+               
+                <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
+                    
+                  
+                    <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${
+                        isOutOfStock
+                            ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/40'
+                            : 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/40'
                     }`}>
-                    {product.condition}
-                </span>
+                        {isOutOfStock ? 'Stock Out' : `${product.stock} Left`}
+                    </span>
+
+                    
+                    <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${
+                        product.condition === 'new'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40'
+                            : 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40'
+                    }`}>
+                        {product.condition}
+                    </span>
+                </div>
             </figure>
 
             <div className="p-4 flex-1 flex flex-col justify-between gap-4">
@@ -59,8 +76,7 @@ export const ProductCard = ({ product }) => {
                         </div>
                     </div>
 
-                    {product?.stock === 0 || product?.status === "sold" ? (
-                        
+                    {isOutOfStock ? (
                         <button
                             disabled
                             className="w-full py-2.5 rounded-xl bg-neutral-300 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 font-bold text-center text-sm block cursor-not-allowed"
@@ -68,7 +84,6 @@ export const ProductCard = ({ product }) => {
                             Sold Out
                         </button>
                     ) : (
-                        
                         <Link
                             href={`/products/${productId}`}
                             className="w-full py-2.5 rounded-xl btn-theme-yellow text-center text-sm font-bold block"

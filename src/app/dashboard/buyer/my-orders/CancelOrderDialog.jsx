@@ -1,7 +1,7 @@
 'use client';
 
 import { AlertDialog } from "@heroui/react";
-import { TrashBin, CircleDashed } from '@gravity-ui/icons';
+import { TrashBin, CircleDashed, Xmark } from '@gravity-ui/icons';
 
 export default function CancelOrderDialog({ isOpen, onOpenChange, onConfirm, isCancelling }) {
 
@@ -20,7 +20,7 @@ export default function CancelOrderDialog({ isOpen, onOpenChange, onConfirm, isC
             onClick={() => onOpenChange(false)}
             className="absolute right-4 top-4 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 text-sm p-1 rounded-lg"
           >
-            ✕
+            <Xmark/>
           </AlertDialog.CloseTrigger>
           
           <AlertDialog.Header className="flex items-center gap-3 mb-2">
