@@ -47,7 +47,7 @@ export default function WishlistTable({ currentUserMail, userId }) {
    
       if (data?.success) {
         setItems(prevItems => prevItems.filter(item => item.productId !== productId));
-        toast.success('Removed from wishlist');
+        toast.error('Removed from wishlist');
       } else {
         toast.error(data?.message || 'Failed to remove item');
       }

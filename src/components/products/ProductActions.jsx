@@ -133,7 +133,7 @@ export default function ProductActions({ product, user }) {
             if (!isWishlisted) {
                 toast.success('Added to wishlist!', { icon: '❤️', ...toastConfig });
             } else {
-                toast('Removed from wishlist', { icon: '🗑️', ...toastConfig });
+                toast.error('Removed from wishlist', { icon: '🗑️', ...toastConfig });
             }
         } catch (error) {
             toast.error('Failed to update wishlist. Try again!', { ...toastConfig });

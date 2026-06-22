@@ -4,28 +4,37 @@ import { useEffect, useState } from 'react';
 import { ShoppingBag, TrashBin, ArrowRotateRight, CircleDashed } from '@gravity-ui/icons';
 import Image from 'next/image';
 import { getMyOrders } from '@/lib/api/orders';
+import { toast } from 'react-hot-toast';
+import CancelOrderDialog from './CancelOrderDialog'; 
 
 export default function MyOrdersTable({ currentUserMail }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
 
-  const fetchMyOrders = async () => {
+  
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [orderToCancel, setOrderToCancel] = useState(null);
+
+  const fetchMyOrders = async (isRefresh = false) => {
     if (!currentUserMail) return;
     try {
       setLoading(true);
       const res = await getMyOrders(currentUserMail);
       
-      
       if (res && res.ok) {
         const data = await res.json();
         setOrders(data);
+        if (isRefresh) toast.success("Orders updated successfully!");
       } else if (Array.isArray(res)) {
-        
         setOrders(res);
+        if (isRefresh) toast.success("Orders updated successfully!");
+      } else {
+        toast.error("Failed to fetch latest orders");
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
+      toast.error("Failed to load orders. Please check your connection.");
     } finally {
       setLoading(false);
     }
@@ -38,9 +47,6 @@ export default function MyOrdersTable({ currentUserMail }) {
   }, [currentUserMail]);
 
   const handleCancelOrder = async (orderId) => {
-    const confirmCancel = window.confirm("Are you sure you want to cancel this order?");
-    if (!confirmCancel) return;
-
     try {
       setActionLoading(orderId);
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/orders/${orderId}/cancel`, {
@@ -55,13 +61,16 @@ export default function MyOrdersTable({ currentUserMail }) {
             order._id === orderId ? { ...order, orderStatus: 'cancelled' } : order
           )
         );
-        alert(data.message);
+        toast.success(data.message || "Order cancelled successfully!");
+        return true; 
       } else {
-        alert(data.message || "Failed to cancel order");
+        toast.error(data.message || "Failed to cancel order");
+        return false;
       }
     } catch (error) {
       console.error("Error cancelling order:", error);
-      alert("Something went wrong!");
+      toast.error("Something went wrong while cancelling the order!");
+      return false;
     } finally {
       setActionLoading(null);
     }
@@ -82,7 +91,6 @@ export default function MyOrdersTable({ currentUserMail }) {
     }
   };
 
-  
   if (loading) {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center gap-2">
@@ -114,7 +122,7 @@ export default function MyOrdersTable({ currentUserMail }) {
           </p>
         </div>
         <button 
-          onClick={fetchMyOrders} 
+          onClick={() => fetchMyOrders(true)}
           className="inline-flex h-9 items-center justify-center rounded-xl border border-neutral-300 dark:border-neutral-700 px-4 text-xs font-medium bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 transition hover:bg-neutral-50 dark:hover:bg-neutral-700/50 gap-2 self-start sm:self-center"
         >
           <ArrowRotateRight className="w-3.5 h-3.5" /> Refresh
@@ -175,16 +183,13 @@ export default function MyOrdersTable({ currentUserMail }) {
                     <td className="p-4 text-right">
                       {(order.orderStatus === 'pending' || order.orderStatus === 'processing') ? (
                         <button
-                          disabled={actionLoading === order._id}
-                          onClick={() => handleCancelOrder(order._id)}
-                          className="inline-flex h-8 items-center justify-center text-xs font-semibold px-3 rounded-xl border border-red-200 dark:border-red-900/50 text-red-500 hover:bg-red-500 hover:text-white dark:hover:bg-red-500 transition disabled:opacity-50 gap-1.5"
+                          onClick={() => {
+                            setOrderToCancel(order._id);
+                            setIsAlertOpen(true);
+                          }}
+                          className="inline-flex h-8 items-center justify-center text-xs font-semibold px-3 rounded-xl border border-red-200 dark:border-red-900/50 text-red-500 hover:bg-red-500 hover:text-white dark:hover:bg-red-500 transition gap-1.5"
                         >
-                      
-                          {actionLoading === order._id ? (
-                            <CircleDashed className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <TrashBin className="w-3.5 h-3.5" />
-                          )}
+                          <TrashBin className="w-3.5 h-3.5" />
                           Cancel
                         </button>
                       ) : (
@@ -198,6 +203,18 @@ export default function MyOrdersTable({ currentUserMail }) {
           </div>
         </div>
       )}
+
+      <CancelOrderDialog 
+        isOpen={isAlertOpen}
+        onOpenChange={setIsAlertOpen}
+        isCancelling={actionLoading === orderToCancel}
+        onConfirm={async () => {
+          const success = await handleCancelOrder(orderToCancel);
+          if (success) {
+            setIsAlertOpen(false); 
+          }
+        }}
+      />
     </>
   );
 }
