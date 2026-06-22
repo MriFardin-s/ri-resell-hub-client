@@ -22,21 +22,17 @@ export const serverFetch = async (path) => {
 
 
 
-export const serverMutation = async (path,data) => {
-    try {
-        const res = await fetch(`${baseUrl}${path}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+export const serverMutation = async (path, data, method = 'POST') => {
+    const res = await fetch(`${baseUrl}${path}`, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+           
+        },
+        body: data ? JSON.stringify(data) : undefined,
+    });
+    return res.json();
 
-        });
-        //handle 401, 402, 403
-        return res.json();
-    } catch (error) {
-        console.error('Error adding product:', error);
-        throw error;
 
-    }
-};  
+    
+}
