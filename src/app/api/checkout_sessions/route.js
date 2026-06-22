@@ -6,7 +6,7 @@ export async function POST(req) {
   try {
     const body = await req.json()
     const { product, buyer } = body
-  
+
 
     const headersList = await headers()
     const origin = headersList.get('origin')
@@ -35,7 +35,10 @@ export async function POST(req) {
         buyerPhone: buyer.phone,
         buyerMail: buyer.email,
         buyerAddress: buyer.address,
+
         productId: product.id,
+        productTitle: product.title, 
+        productImage: product.image || '', 
 
         sellerId: product.sellerInfo?.userId,
         sellerName: product.sellerInfo?.name,
