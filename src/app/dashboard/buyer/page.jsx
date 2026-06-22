@@ -1,59 +1,113 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card } from "@heroui/react";
-import { ShoppingBag, Heart, ArrowRight, Clock } from '@gravity-ui/icons';
+import { ShoppingBag, Heart, ArrowRight, Clock, CircleDashed } from '@gravity-ui/icons';
+import { toast } from 'react-hot-toast';
+import { getBuyerDashboard } from '@/lib/api/getBuyerDashboard';
+import { useSession } from '@/lib/auth-client';
 
 export default function BuyerDashboardHome() {
-  const stats = {
-    totalOrders: 5,
-    wishlistCount: 3,
-  };
 
-  const recentPurchases = [
-    {
-      _id: "order001",
-      productName: "Used Dell Inspiron 15 Laptop",
-      price: 35000,
-      date: "2026-06-15",
-      orderStatus: "processing" 
-    },
-    {
-      _id: "order002",
-      productName: "Nike Air Max 90",
-      price: 4500,
-      date: "2026-06-10",
-      orderStatus: "delivered"
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
+  const currentUserMail = user?.email
+
+  const [dashboardData, setDashboardData] = useState({
+    totalOrders: 0,
+    wishlistCount: 0,
+    recentPurchases: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+ 
+  useEffect(() => {
+    if (!currentUserMail) {
+      setLoading(false);
+      return;
     }
-  ];
+
+    const fetchDashboardSummary = async () => {
+      try {
+        setLoading(true);
+      
+        const res = await getBuyerDashboard(currentUserMail);
+
+       
+        if (res && res.success) {
+          setDashboardData({
+            totalOrders: res.totalOrders || 0,
+            wishlistCount: res.wishlistCount || 0,
+            recentPurchases: res.recentPurchases || [],
+          });
+        } else {
+          toast.error("Failed to load dashboard activities");
+        }
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+        toast.error("Connection error! Could not retrieve summary.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardSummary();
+  }, [currentUserMail]);
 
   const getStatusClass = (status) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
       case 'processing': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
       case 'delivered': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+      case 'cancelled': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
       default: return 'bg-gray-100 text-gray-800 dark:bg-neutral-800 dark:text-neutral-400';
     }
   };
 
+ 
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-2">
+        <CircleDashed className="w-8 h-8 text-yellow-500 animate-spin" />
+        <p className="text-sm font-medium text-neutral-500 animate-pulse">Loading dashboard activities...</p>
+      </div>
+    );
+  }
+
+
+  if (!currentUserMail) {
+    return (
+      <div className="max-w-md mx-auto mt-12 text-center py-12 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800">
+        <p className="text-red-500 font-semibold">Access Denied</p>
+        <p className="text-sm text-neutral-500 mt-1">Please log in to view your dashboard analytics.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8 p-6 max-w-7xl mx-auto">
+    <div className="space-y-8 p-6 max-w-7xl mx-auto animate-in fade-in duration-300">
+    
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, Buyer!</h1>
-        <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1">Here is a summary of your recent marketplace activity.</p>
+        <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+          Hi {user?.name}! 
+        </h1>
+        <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1">
+          Here is a summary of your recent marketplace activity.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
         <Card className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 shadow-sm rounded-2xl">
           <Card.Header className="p-6 pb-0">
-            <Card.Title className="text-sm font-medium text-gray-500 dark:text-neutral-400">
+            <Card.Title className="text-sm font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
               Total Orders
             </Card.Title>
           </Card.Header>
           <Card.Content className="p-6 pt-2 flex items-center justify-between">
-            <span className="text-3xl font-bold text-gray-900 dark:text-white">
-              {stats.totalOrders}
+            <span className="text-3xl font-black text-gray-900 dark:text-white">
+              {dashboardData.totalOrders}
             </span>
             <div className="p-4 bg-blue-50 dark:bg-blue-950/40 rounded-xl text-blue-600 dark:text-blue-400">
               <ShoppingBag width={28} height={28} />
@@ -61,15 +115,16 @@ export default function BuyerDashboardHome() {
           </Card.Content>
         </Card>
 
+
         <Card className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 shadow-sm rounded-2xl">
           <Card.Header className="p-6 pb-0">
-            <Card.Title className="text-sm font-medium text-gray-500 dark:text-neutral-400">
+            <Card.Title className="text-sm font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
               Wishlist Count
             </Card.Title>
           </Card.Header>
           <Card.Content className="p-6 pt-2 flex items-center justify-between">
-            <span className="text-3xl font-bold text-gray-900 dark:text-white">
-              {stats.wishlistCount}
+            <span className="text-3xl font-black text-gray-900 dark:text-white">
+              {dashboardData.wishlistCount}
             </span>
             <div className="p-4 bg-rose-50 dark:bg-rose-950/40 rounded-xl text-rose-600 dark:text-rose-400">
               <Heart width={28} height={28} />
@@ -85,17 +140,17 @@ export default function BuyerDashboardHome() {
             Recent Purchases
           </Card.Title>
           <Card.Description>
-            <Link 
-              href="/dashboard/buyer/orders" 
-              className="text-sm font-semibold text-theme-yellow-primary hover:underline flex items-center gap-1 transition"
+            <Link
+              href="/dashboard/buyer/my-orders"
+              className="text-sm font-bold text-theme-yellow-primary hover:underline flex items-center gap-1 transition"
             >
               View All Orders <ArrowRight width={16} height={16} />
             </Link>
           </Card.Description>
         </Card.Header>
         <Card.Content className="p-0">
-          {recentPurchases.length === 0 ? (
-            <div className="p-8 text-center text-gray-500 dark:text-neutral-400">
+          {dashboardData.recentPurchases.length === 0 ? (
+            <div className="p-12 text-center text-sm font-medium text-gray-500 dark:text-neutral-400">
               You have not purchased anything yet.
             </div>
           ) : (
@@ -110,20 +165,24 @@ export default function BuyerDashboardHome() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-neutral-800 text-sm">
-                  {recentPurchases.map((purchase) => (
+                  {dashboardData.recentPurchases.map((purchase) => (
                     <tr key={purchase._id} className="hover:bg-gray-50/50 dark:hover:bg-neutral-800/30 transition">
-                      <td className="p-4 font-semibold text-gray-900 dark:text-white max-w-xs truncate">
+                      <td className="p-4 font-bold text-gray-800 dark:text-neutral-100 max-w-xs truncate">
                         {purchase.productName}
                       </td>
-                      <td className="p-4 text-gray-700 dark:text-neutral-300 font-medium">
-                        ${purchase.price.toLocaleString()}
+                      <td className="p-4 text-gray-900 dark:text-neutral-200 font-extrabold">
+                        ${purchase.price?.toLocaleString()}
                       </td>
-                      <td className="p-4 text-gray-500 dark:text-neutral-400">
-                        {purchase.date}
+                      <td className="p-4 text-gray-500 dark:text-neutral-400 font-medium">
+                        {purchase.date ? new Date(purchase.date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        }) : 'N/A'}
                       </td>
                       <td className="p-4">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-bold capitalize ${getStatusClass(purchase.orderStatus)}`}>
-                          {purchase.orderStatus}
+                          {purchase.orderStatus || 'Pending'}
                         </span>
                       </td>
                     </tr>
