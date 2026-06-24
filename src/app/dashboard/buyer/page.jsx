@@ -9,10 +9,9 @@ import { getBuyerDashboard } from '@/lib/api/getBuyerDashboard';
 import { useSession } from '@/lib/auth-client';
 
 export default function BuyerDashboardHome() {
-
   const { data: session, isPending } = useSession();
   const user = session?.user;
-  const currentUserMail = user?.email
+  const currentUserMail = user?.email;
 
   const [dashboardData, setDashboardData] = useState({
     totalOrders: 0,
@@ -21,20 +20,15 @@ export default function BuyerDashboardHome() {
   });
   const [loading, setLoading] = useState(true);
 
- 
   useEffect(() => {
-    if (!currentUserMail) {
-      setLoading(false);
-      return;
-    }
+    // 🎯 সেশন লোড হওয়া শেষ না হওয়া পর্যন্ত এপিআই কল আটকানো হলো
+    if (isPending || !currentUserMail) return;
 
     const fetchDashboardSummary = async () => {
       try {
         setLoading(true);
-      
         const res = await getBuyerDashboard(currentUserMail);
 
-       
         if (res && res.success) {
           setDashboardData({
             totalOrders: res.totalOrders || 0,
@@ -53,7 +47,7 @@ export default function BuyerDashboardHome() {
     };
 
     fetchDashboardSummary();
-  }, [currentUserMail]);
+  }, [currentUserMail, isPending]); // 🎯 ডিপেন্ডেন্সিতে isPending যোগ করা হলো
 
   const getStatusClass = (status) => {
     switch (status?.toLowerCase()) {
@@ -65,8 +59,8 @@ export default function BuyerDashboardHome() {
     }
   };
 
- 
-  if (loading) {
+  // 🎯 ১. সেশন লোড হওয়ার সময় বা এপিআই ফেচিং এর সময় লোডিং দেখানো
+  if (isPending || loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-2">
         <CircleDashed className="w-8 h-8 text-yellow-500 animate-spin" />
@@ -75,7 +69,7 @@ export default function BuyerDashboardHome() {
     );
   }
 
-
+  // 🎯 ২. সেশন লোড শেষ কিন্তু ইমেইল পাওয়া যায়নি—কেবল তখনই এই অ্যাক্সেস ডিনাইড আসবে
   if (!currentUserMail) {
     return (
       <div className="max-w-md mx-auto mt-12 text-center py-12 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800">
@@ -87,7 +81,6 @@ export default function BuyerDashboardHome() {
 
   return (
     <div className="space-y-8 p-6 max-w-7xl mx-auto animate-in fade-in duration-300">
-    
       <div>
         <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
           Hi {user?.name}! 
@@ -98,7 +91,6 @@ export default function BuyerDashboardHome() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
         <Card className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 shadow-sm rounded-2xl">
           <Card.Header className="p-6 pb-0">
             <Card.Title className="text-sm font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500">
@@ -114,7 +106,6 @@ export default function BuyerDashboardHome() {
             </div>
           </Card.Content>
         </Card>
-
 
         <Card className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 shadow-sm rounded-2xl">
           <Card.Header className="p-6 pb-0">

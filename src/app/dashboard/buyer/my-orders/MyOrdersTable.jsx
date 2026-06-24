@@ -5,14 +5,13 @@ import { ShoppingBag, TrashBin, ArrowRotateRight, CircleDashed } from '@gravity-
 import Image from 'next/image';
 import { getMyOrders } from '@/lib/api/orders';
 import { toast } from 'react-hot-toast';
-import CancelOrderDialog from './CancelOrderDialog'; 
+import CancelOrderDialog from './CancelOrderDialog';
 
 export default function MyOrdersTable({ currentUserMail }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
 
-  
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState(null);
 
@@ -21,7 +20,7 @@ export default function MyOrdersTable({ currentUserMail }) {
     try {
       setLoading(true);
       const res = await getMyOrders(currentUserMail);
-      
+
       if (res && res.ok) {
         const data = await res.json();
         setOrders(data);
@@ -62,7 +61,7 @@ export default function MyOrdersTable({ currentUserMail }) {
           )
         );
         toast.success(data.message || "Order cancelled successfully!");
-        return true; 
+        return true;
       } else {
         toast.error(data.message || "Failed to cancel order");
         return false;
@@ -86,6 +85,12 @@ export default function MyOrdersTable({ currentUserMail }) {
         return <span className="bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-blue-500/20">Pending</span>;
       case 'cancelled':
         return <span className="bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-red-500/20">Cancelled</span>;
+      case 'delivered':
+        return (
+          <span className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-emerald-500/20">
+            Delivered
+          </span>
+        );
       default:
         return <span className="bg-neutral-100 dark:bg-neutral-800 text-xs px-2.5 py-1 rounded-lg">{status}</span>;
     }
@@ -121,7 +126,7 @@ export default function MyOrdersTable({ currentUserMail }) {
             Manage and track all your purchased items in one place.
           </p>
         </div>
-        <button 
+        <button
           onClick={() => fetchMyOrders(true)}
           className="inline-flex h-9 items-center justify-center rounded-xl border border-neutral-300 dark:border-neutral-700 px-4 text-xs font-medium bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 transition hover:bg-neutral-50 dark:hover:bg-neutral-700/50 gap-2 self-start sm:self-center"
         >
@@ -154,10 +159,10 @@ export default function MyOrdersTable({ currentUserMail }) {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-neutral-100 border border-neutral-200 dark:border-neutral-700 shrink-0">
-                          <Image 
-                            src={order.productImage} 
-                            alt={order.productTitle} 
-                            fill 
+                          <Image
+                            src={order.productImage}
+                            alt={order.productTitle}
+                            fill
                             className="object-cover"
                             unoptimized
                           />
@@ -183,7 +188,9 @@ export default function MyOrdersTable({ currentUserMail }) {
                     <td className="p-4 text-right">
                       {(order.orderStatus === 'pending' || order.orderStatus === 'processing') ? (
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            console.log("🟢 Cancel Button Clicked! Order ID:", order._id);
                             setOrderToCancel(order._id);
                             setIsAlertOpen(true);
                           }}
@@ -204,17 +211,20 @@ export default function MyOrdersTable({ currentUserMail }) {
         </div>
       )}
 
-      <CancelOrderDialog 
-        isOpen={isAlertOpen}
-        onOpenChange={setIsAlertOpen}
-        isCancelling={actionLoading === orderToCancel}
-        onConfirm={async () => {
-          const success = await handleCancelOrder(orderToCancel);
-          if (success) {
-            setIsAlertOpen(false); 
-          }
-        }}
-      />
+      {isAlertOpen && (
+        <CancelOrderDialog
+          isOpen={isAlertOpen}
+          onOpenChange={setIsAlertOpen}
+          isCancelling={actionLoading === orderToCancel}
+          onConfirm={async () => {
+
+            const success = await handleCancelOrder(orderToCancel);
+            if (success) {
+              setIsAlertOpen(false);
+            }
+          }}
+        />
+      )}
     </>
   );
 }

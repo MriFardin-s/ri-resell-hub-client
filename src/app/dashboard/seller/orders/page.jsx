@@ -1,11 +1,11 @@
-import React from 'react';
+import { getUserSession } from '@/lib/core/session';
+import SellerOrdersClient from './SellerOrdersClient';
 
-const SellerOrderManagePage = () => {
-    return (
-        <div>
-            orders
-        </div>
-    );
+
+const SellerOrderManagePage = async () => {
+  const user = await getUserSession();
+
+  return <SellerOrdersClient user={user} />;
 };
 
 export default SellerOrderManagePage;

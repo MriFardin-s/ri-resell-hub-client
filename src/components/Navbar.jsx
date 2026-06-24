@@ -29,7 +29,7 @@ export default function Navbar() {
   const dashboardLink ={
     buyer: '/dashboard/buyer',
     seller:'/dashboard/seller',
-    admin: ''
+    admin: '/dashboard/admin'
   }
     if(user?.email){
         navLinks.push(
@@ -153,10 +153,10 @@ export default function Navbar() {
 
                                 {isDropdownOpen && (
                                     <div className="absolute right-0 top-12 w-48 bg-white dark:bg-neutral-900 rounded-xl shadow-xl py-2 border border-gray-100 dark:border-neutral-800 z-50 animate-fade-in">
-                                        <Link href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-neutral-300 hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:text-amber-800 dark:hover:text-amber-400 transition">My Profile</Link>
+                                        {/* <Link href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-neutral-300 hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:text-amber-800 dark:hover:text-amber-400 transition">My Profile</Link>
                                         <Link href="/settings" className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-neutral-300 hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:text-amber-800 dark:hover:text-amber-400 transition">Settings</Link>
                                         <Link href="/orders" className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-neutral-300 hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:text-amber-800 dark:hover:text-amber-400 transition">Orders</Link>
-                                        <hr className="my-1 border-gray-100 dark:border-neutral-800" />
+                                        <hr className="my-1 border-gray-100 dark:border-neutral-800" /> */}
                                         <button
                                             onClick={handleSignOut}
                                             disabled={isLoggingOut}

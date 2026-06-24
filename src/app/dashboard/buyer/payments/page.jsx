@@ -2,6 +2,7 @@ import React from 'react';
 import { Card } from "@heroui/react";
 import { getUserSession } from '@/lib/core/session';
 import { getPaymentHistory } from '@/lib/api/getPaymentHistory';
+import { redirect } from 'next/navigation';
 
 
 
@@ -9,13 +10,7 @@ export default async function PaymentHistoryPage() {
   const user = await getUserSession();
   
 
-  if (!user?.email) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <p className="text-sm font-medium text-neutral-500">Please log in to view your payment history.</p>
-      </div>
-    );
-  }
+
 
   const payments = await getPaymentHistory(user?.email);
 
@@ -51,7 +46,7 @@ export default async function PaymentHistoryPage() {
               <tbody className="divide-y divide-gray-100 dark:divide-neutral-800 text-sm">
                 {payments.map((payment) => (
                   <tr key={payment._id} className="hover:bg-gray-50/50 dark:hover:bg-neutral-800/20 transition-colors">
-                    {/* প্রোডাক্ট ইনফো */}
+                 
                     <td className="p-4">
                       <div className="font-bold text-gray-900 dark:text-white">
                         {payment.product?.title || "Premium Item"}
@@ -61,12 +56,12 @@ export default async function PaymentHistoryPage() {
                       </div>
                     </td>
                     
-                    {/* ট্রানজেকশন আইডি */}
+                
                     <td className="p-4 font-mono text-xs text-gray-500 dark:text-neutral-400">
                       {payment.stripeSessionId ? payment.stripeSessionId.substring(0, 18) + "..." : "N/A"}
                     </td>
                     
-                    {/* পেমেন্টের তারিখ */}
+                   
                     <td className="p-4 text-gray-600 dark:text-neutral-300">
                       {payment.createdAt ? new Date(payment.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -75,12 +70,12 @@ export default async function PaymentHistoryPage() {
                       }) : "N/A"}
                     </td>
                     
-                    {/* পেমেন্টের অ্যামাউন্ট */}
+                  
                     <td className="p-4 font-black text-gray-900 dark:text-white">
                       ${payment.amountPaid?.toFixed(2) || "0.00"}
                     </td>
                     
-                    {/* পেমেন্ট স্ট্যাটাস ব্যাজ */}
+                  
                     <td className="p-4">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
                         payment.paymentStatus === 'paid' 
