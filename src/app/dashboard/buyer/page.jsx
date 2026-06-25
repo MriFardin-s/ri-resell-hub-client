@@ -21,7 +21,7 @@ export default function BuyerDashboardHome() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 🎯 সেশন লোড হওয়া শেষ না হওয়া পর্যন্ত এপিআই কল আটকানো হলো
+    
     if (isPending || !currentUserMail) return;
 
     const fetchDashboardSummary = async () => {
@@ -47,7 +47,7 @@ export default function BuyerDashboardHome() {
     };
 
     fetchDashboardSummary();
-  }, [currentUserMail, isPending]); // 🎯 ডিপেন্ডেন্সিতে isPending যোগ করা হলো
+  }, [currentUserMail, isPending]); 
 
   const getStatusClass = (status) => {
     switch (status?.toLowerCase()) {
@@ -59,7 +59,7 @@ export default function BuyerDashboardHome() {
     }
   };
 
-  // 🎯 ১. সেশন লোড হওয়ার সময় বা এপিআই ফেচিং এর সময় লোডিং দেখানো
+  
   if (isPending || loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-2">
@@ -69,7 +69,7 @@ export default function BuyerDashboardHome() {
     );
   }
 
-  // 🎯 ২. সেশন লোড শেষ কিন্তু ইমেইল পাওয়া যায়নি—কেবল তখনই এই অ্যাক্সেস ডিনাইড আসবে
+ 
   if (!currentUserMail) {
     return (
       <div className="max-w-md mx-auto mt-12 text-center py-12 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800">

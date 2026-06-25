@@ -98,12 +98,22 @@ export default function MyOrdersTable({ currentUserMail }) {
 
   if (loading) {
     return (
-      <div className="min-h-[50vh] flex flex-col items-center justify-center gap-2">
-        <CircleDashed className="w-8 h-8 text-yellow-500 animate-spin" />
-        <p className="text-sm font-medium text-neutral-500 animate-pulse">Loading your orders...</p>
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <div className="relative">
+
+          <CircleDashed className="w-10 h-10 text-yellow-500 animate-spin" />
+
+
+          <div className="absolute inset-0 bg-yellow-500/20 blur-xl rounded-full animate-pulse" />
+        </div>
+
+        <p className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 animate-pulse tracking-wide">
+          Loading Your Orders...
+        </p>
       </div>
     );
   }
+
 
   if (!currentUserMail) {
     return (

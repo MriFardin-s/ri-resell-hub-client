@@ -26,9 +26,9 @@ export async function  DashboardSidebar() {
   const adminNavLinks = [
     { icon: House, href: "/dashboard/admin", label: "Home" },
     { icon: PersonFill, href: "/dashboard/admin/users", label: "Manage Users" },
-    { icon: BroomMotion, href: "/dashboard/admin/products", label: "Manage Products" },
-    { icon: Envelope, href: "/dashboard/admin/orders", label: "Manage Orders" },
-    { icon: ChartMixed, href: "/dashboard/admin/analytics", label: "Platform Analytics" },
+    { icon: BroomMotion, href: "/dashboard/admin/manage-products", label: "Manage Products" },
+    { icon: Envelope, href: "/dashboard/admin/manage-orders", label: "Manage Orders" },
+    { icon: ChartMixed, href: "/dashboard/admin/admin-analytics", label: "Platform Analytics" },
   ];
 
   const navLinksMap ={
@@ -38,7 +38,7 @@ export async function  DashboardSidebar() {
   }
 
 
-  const navItems = navLinksMap[user?.role || 'buyer'];
+  const navItems = navLinksMap[user?.userRole || 'buyer'];
 
   const navContent = (
     <nav className="flex flex-col gap-1.5">

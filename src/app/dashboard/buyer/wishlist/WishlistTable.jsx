@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Heart, TrashBin, ArrowRotateRight,  ArrowRight, CircleDashed } from '@gravity-ui/icons';
+import { Heart, TrashBin, ArrowRotateRight, ArrowRight, CircleDashed } from '@gravity-ui/icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
@@ -19,7 +19,7 @@ export default function WishlistTable({ currentUserMail, userId }) {
     if (!currentUserMail) return;
     try {
       setLoading(true);
-  
+
       const data = await getWishlist(currentUserMail);
       if (data && Array.isArray(data)) {
         setItems(data);
@@ -41,10 +41,10 @@ export default function WishlistTable({ currentUserMail, userId }) {
   const handleRemoveItem = async (productId) => {
     try {
       setActionLoading(productId);
-    
+
       const data = await removeWishlist(userId, productId);
 
-   
+
       if (data?.success) {
         setItems(prevItems => prevItems.filter(item => item.productId !== productId));
         toast.error('Removed from wishlist');
@@ -61,12 +61,22 @@ export default function WishlistTable({ currentUserMail, userId }) {
 
   if (loading) {
     return (
-      <div className="min-h-[50vh] flex flex-col items-center justify-center gap-2">
-        <CircleDashed className="w-8 h-8 text-theme-yellow-primary animate-spin" />
-        <p className="text-sm font-medium text-neutral-500 animate-pulse">Loading your wishlist...</p>
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <div className="relative">
+
+          <CircleDashed className="w-10 h-10 text-yellow-500 animate-spin" />
+
+
+          <div className="absolute inset-0 bg-yellow-500/20 blur-xl rounded-full animate-pulse" />
+        </div>
+
+        <p className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 animate-pulse tracking-wide">
+          Loading Wishlist...
+        </p>
       </div>
     );
   }
+
 
   return (
     <>
@@ -80,8 +90,8 @@ export default function WishlistTable({ currentUserMail, userId }) {
             View and manage all the amazing products you saved for later.
           </p>
         </div>
-        <button 
-          onClick={fetchWishlist} 
+        <button
+          onClick={fetchWishlist}
           className="inline-flex h-9 items-center justify-center rounded-xl border border-neutral-300 dark:border-neutral-700 px-4 text-xs font-medium bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 transition hover:bg-neutral-50 dark:hover:bg-neutral-700/50 gap-2 self-start sm:self-center"
         >
           <ArrowRotateRight className="w-3.5 h-3.5" /> Refresh
@@ -112,10 +122,10 @@ export default function WishlistTable({ currentUserMail, userId }) {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-neutral-100 border border-neutral-200 dark:border-neutral-700 shrink-0">
-                          <Image 
-                            src={item.productImage} 
-                            alt={item.productTitle} 
-                            fill 
+                          <Image
+                            src={item.productImage}
+                            alt={item.productTitle}
+                            fill
                             className="object-cover"
                             unoptimized
                           />
@@ -144,7 +154,7 @@ export default function WishlistTable({ currentUserMail, userId }) {
                         </span>
                       )}
                     </td>
-                 
+
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Link

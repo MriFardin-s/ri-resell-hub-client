@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Bars, Xmark } from '@gravity-ui/icons';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation'; 
+import { usePathname, useRouter } from 'next/navigation';
 import { useSession, authClient } from '@/lib/auth-client';
 import Image from 'next/image';
 import { useTheme } from '@/components/theme-provider';
@@ -13,47 +13,46 @@ export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const pathname = usePathname();
-    const router = useRouter(); 
+    const router = useRouter();
 
     const { theme, setTheme } = useTheme();
     const { data: session, isPending } = useSession();
     const user = session?.user;
 
+    const dashboardLink = {
+        buyer: '/dashboard/buyer',
+        seller: '/dashboard/seller',
+        admin: '/dashboard/admin'
+    };
+   
+    const userRole = user?.userRole?.toLowerCase() || 'buyer';
+
     const navLinks = [
         { name: 'Home', href: '/' },
         { name: 'Products', href: '/products' },
-        { name: 'Categories', href: '/categories' },
-        
-
+        ...(user?.email && dashboardLink[userRole]
+            ? [{ name: 'Dashboard', href: dashboardLink[userRole] }]
+            : [])
     ];
-  const dashboardLink ={
-    buyer: '/dashboard/buyer',
-    seller:'/dashboard/seller',
-    admin: '/dashboard/admin'
-  }
-    if(user?.email){
-        navLinks.push(
-            { name: 'Dashboard', href: dashboardLink [user?.role || 'buyer']},
-        )
-    }
 
     const handleSignOut = async () => {
         try {
             setIsLoggingOut(true);
             setIsDropdownOpen(false);
             setIsMobileMenuOpen(false);
-            
+
             await authClient.signOut({
                 callbackURL: "/auth/signin"
             });
 
-            window.location.href = "/auth/signin"; 
-            
+            window.location.href = "/auth/signin";
+
         } catch (error) {
             console.error("Sign out failed:", error);
             setIsLoggingOut(false);
         }
     };
+
 
     if (isLoggingOut) {
         return (
@@ -77,7 +76,7 @@ export default function Navbar() {
         <nav className="bg-white dark:bg-neutral-950 shadow-md border-b-2 border-theme-yellow-primary sticky top-0 z-50 transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
-                    
+
                     <div className="flex items-center md:hidden">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -87,12 +86,14 @@ export default function Navbar() {
                         </button>
                     </div>
 
+                
                     <div className="flex-shrink-0 flex items-center">
                         <Link href="/" className="text-2xl font-black tracking-wider text-neutral-800 dark:text-neutral-100">
                             RESELL<span className="text-neutral-900 bg-theme-yellow-primary px-2 py-1 rounded ml-1">HUB</span>
                         </Link>
                     </div>
 
+                  
                     <div className="hidden md:flex space-x-8 font-medium">
                         {navLinks.map((link) => {
                             const isActive = pathname === link.href;
@@ -100,11 +101,10 @@ export default function Navbar() {
                                 <Link
                                     key={link.name}
                                     href={link.href}
-                                    className={`transition-all duration-200 pb-1 border-b-2 ${
-                                        isActive
-                                            ? 'text-neutral-900 dark:text-neutral-100 font-bold border-theme-yellow-primary'
-                                            : 'text-gray-600 dark:text-neutral-400 border-transparent hover:text-theme-yellow-hover'
-                                    }`}
+                                    className={`transition-all duration-200 pb-1 border-b-2 ${isActive
+                                        ? 'text-neutral-900 dark:text-neutral-100 font-bold border-theme-yellow-primary'
+                                        : 'text-gray-600 dark:text-neutral-400 border-transparent hover:text-theme-yellow-hover'
+                                        }`}
                                 >
                                     {link.name}
                                 </Link>
@@ -112,7 +112,9 @@ export default function Navbar() {
                         })}
                     </div>
 
+          
                     <div className="flex items-center space-x-4">
+                     
                         <button
                             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                             className="p-2 rounded-xl text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-900 transition focus:outline-none"
@@ -129,6 +131,7 @@ export default function Navbar() {
                             )}
                         </button>
 
+                   
                         {user ? (
                             <div className="relative flex items-center space-x-3">
                                 <span className="hidden sm:inline text-sm font-medium text-neutral-700 dark:text-neutral-300">Hi, {user.name}!</span>
@@ -153,10 +156,6 @@ export default function Navbar() {
 
                                 {isDropdownOpen && (
                                     <div className="absolute right-0 top-12 w-48 bg-white dark:bg-neutral-900 rounded-xl shadow-xl py-2 border border-gray-100 dark:border-neutral-800 z-50 animate-fade-in">
-                                        {/* <Link href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-neutral-300 hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:text-amber-800 dark:hover:text-amber-400 transition">My Profile</Link>
-                                        <Link href="/settings" className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-neutral-300 hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:text-amber-800 dark:hover:text-amber-400 transition">Settings</Link>
-                                        <Link href="/orders" className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-neutral-300 hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:text-amber-800 dark:hover:text-amber-400 transition">Orders</Link>
-                                        <hr className="my-1 border-gray-100 dark:border-neutral-800" /> */}
                                         <button
                                             onClick={handleSignOut}
                                             disabled={isLoggingOut}
@@ -168,20 +167,19 @@ export default function Navbar() {
                                 )}
                             </div>
                         ) : (
+                           
                             <div className="hidden sm:flex items-center space-x-3">
                                 <Link
                                     href="/auth/signin"
-                                    className={`px-5 py-2 rounded-xl shadow-sm text-sm font-semibold transition-all duration-200 ${
-                                        pathname === '/auth/signin' ? 'btn-theme-yellow' : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-800'
-                                    }`}
+                                    className={`px-5 py-2 rounded-xl shadow-sm text-sm font-semibold transition-all duration-200 ${pathname === '/auth/signin' ? 'btn-theme-yellow' : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-800'
+                                        }`}
                                 >
                                     Sign In
                                 </Link>
                                 <Link
                                     href="/auth/signup"
-                                    className={`px-5 py-2 rounded-xl shadow-sm text-sm font-semibold transition-all duration-200 ${
-                                        pathname === '/auth/signup' ? 'btn-theme-yellow' : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-800'
-                                    }`}
+                                    className={`px-5 py-2 rounded-xl shadow-sm text-sm font-semibold transition-all duration-200 ${pathname === '/auth/signup' ? 'btn-theme-yellow' : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-800'
+                                        }`}
                                 >
                                     Sign Up
                                 </Link>
@@ -191,6 +189,7 @@ export default function Navbar() {
                 </div>
             </div>
 
+  
             {isMobileMenuOpen && (
                 <div className="md:hidden bg-gray-50 dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-800 px-4 pt-2 pb-4 space-y-1 transition-colors duration-300">
                     <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-neutral-800 mb-2">
@@ -218,11 +217,10 @@ export default function Navbar() {
                                 key={link.name}
                                 href={link.href}
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className={`block px-3 py-2 rounded-xl text-base font-medium transition ${
-                                    isActive 
-                                        ? 'bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200' 
-                                        : 'text-gray-700 dark:text-neutral-300 hover:bg-amber-50 dark:hover:bg-neutral-800/50 hover:text-theme-yellow-hover'
-                                }`}
+                                className={`block px-3 py-2 rounded-xl text-base font-medium transition ${isActive
+                                    ? 'bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200'
+                                    : 'text-gray-700 dark:text-neutral-300 hover:bg-amber-50 dark:hover:bg-neutral-800/50 hover:text-theme-yellow-hover'
+                                    }`}
                             >
                                 {link.name}
                             </Link>
@@ -252,18 +250,16 @@ export default function Navbar() {
                                 <Link
                                     href="/auth/signin"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`px-6 py-2.5 rounded-xl shadow-sm text-sm text-center font-semibold transition-colors duration-200 ${
-                                        pathname === '/auth/signin' ? 'btn-theme-yellow' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200'
-                                    }`}
+                                    className={`px-6 py-2.5 rounded-xl shadow-sm text-sm text-center font-semibold transition-colors duration-200 ${pathname === '/auth/signin' ? 'btn-theme-yellow' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200'
+                                        }`}
                                 >
                                     Sign In
                                 </Link>
                                 <Link
                                     href="/auth/signup"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`px-6 py-2.5 rounded-xl shadow-sm text-sm text-center font-semibold transition-colors duration-200 ${
-                                        pathname === '/auth/signup' ? 'btn-theme-yellow' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200'
-                                    }`}
+                                    className={`px-6 py-2.5 rounded-xl shadow-sm text-sm text-center font-semibold transition-colors duration-200 ${pathname === '/auth/signup' ? 'btn-theme-yellow' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200'
+                                        }`}
                                 >
                                     Sign Up
                                 </Link>

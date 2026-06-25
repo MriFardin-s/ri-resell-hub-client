@@ -1,19 +1,20 @@
 import { getUserSession } from '@/lib/core/session';
 import { redirect } from 'next/navigation';
-import AdminDashboardClient from './AdminDashboardClient';
+import AdminOrdersClient from './AdminOrdersClien';
 
-const AdminDashboardHome = async () => {
+
+const AdminManageOrder = async () => {
   const user = await getUserSession();
 
   if (!user) {
     redirect('/login');
   }
 
-  if (user.role !== 'admin') {
+  if (user?.userRole !== 'admin') {
     redirect('/');
   }
 
-  return <AdminDashboardClient />;
+  return <AdminOrdersClient />;
 };
 
-export default AdminDashboardHome;
+export default AdminManageOrder;

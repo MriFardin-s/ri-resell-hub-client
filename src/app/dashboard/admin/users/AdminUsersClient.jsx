@@ -1,14 +1,16 @@
+
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Card } from "@heroui/react";
+import { Card, Button, AlertDialog } from "@heroui/react";
 import toast from 'react-hot-toast';
+import { CircleDashed } from '@gravity-ui/icons';
 
 export default function AdminUsersClient({ initialUsers }) {
     const [users, setUsers] = useState(initialUsers || []);
     const [search, setSearch] = useState('');
     const [deleteId, setDeleteId] = useState(null);
-    const [actionLoading, setActionLoading] = useState(null); 
+    const [actionLoading, setActionLoading] = useState(null);
 
     const filteredUsers = useMemo(() => {
         return users.filter(
@@ -18,17 +20,17 @@ export default function AdminUsersClient({ initialUsers }) {
         );
     }, [users, search]);
 
-    const handleDelete = async (id) => {
-        if (!id) return toast.error("Invalid User ID");
+    const handleDelete = async () => {
+        if (!deleteId) return toast.error("Invalid User ID");
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/users/${id}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/users/${deleteId}`, {
                 method: 'DELETE',
             });
 
             const result = await res.json();
 
             if (result.success) {
-                setUsers((prev) => prev.filter((user) => user.id !== id && user._id !== id));
+                setUsers((prev) => prev.filter((user) => user.id !== deleteId && user._id !== deleteId));
                 toast.success(result.message || 'User deleted successfully');
             } else {
                 toast.error(result.message || 'Failed to delete user');
@@ -89,9 +91,9 @@ export default function AdminUsersClient({ initialUsers }) {
                     prev.map((user) =>
                         (user.id === id || user._id === id)
                             ? {
-                                  ...user,
-                                  role: actionType === 'make_admin' ? 'admin' : (user.previousRole || 'buyer'),
-                              }
+                                ...user,
+                                userRole: actionType === 'make_admin' ? 'admin' : (user.previousRole || 'buyer'),
+                            }
                             : user
                     )
                 );
@@ -109,8 +111,7 @@ export default function AdminUsersClient({ initialUsers }) {
 
     return (
         <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
-            
-            {/* 💳 HeroUI Card Wrapper with Dark/Light Support */}
+
             <Card className="p-6 shadow-sm border border-neutral-100 dark:border-neutral-800 bg-white dark:bg-[#121212] transition-colors duration-300">
                 <Card.Header className="flex flex-col items-start gap-4 p-0 pb-6 border-b border-gray-100 dark:border-neutral-800/60">
                     <div>
@@ -122,7 +123,6 @@ export default function AdminUsersClient({ initialUsers }) {
                         </Card.Description>
                     </div>
 
-                    {/* Search Input */}
                     <div className="w-full">
                         <input
                             type="text"
@@ -135,7 +135,6 @@ export default function AdminUsersClient({ initialUsers }) {
                 </Card.Header>
 
                 <Card.Content className="p-0 pt-6">
-                    {/* Table Responsive Wrapper */}
                     <div className="overflow-x-auto rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#161616] shadow-sm dark:shadow-2xl">
                         <table className="w-full border-collapse text-left">
                             <thead className="bg-gray-50 dark:bg-[#1a1a1a] border-b border-neutral-200 dark:border-neutral-800">
@@ -151,7 +150,7 @@ export default function AdminUsersClient({ initialUsers }) {
 
                             <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/50">
                                 {filteredUsers.map((user, index) => {
-                                    const userId = user._id || user.id; // Fallback checked to avoid undefined
+                                    const userId = user._id || user.id;
 
                                     return (
                                         <tr key={userId || `user-${index}`} className="hover:bg-gray-50/50 dark:hover:bg-neutral-800/30 transition-colors">
@@ -169,11 +168,10 @@ export default function AdminUsersClient({ initialUsers }) {
                                             <td className="p-4 text-sm text-gray-600 dark:text-neutral-400">{user.email}</td>
 
                                             <td className="p-4 text-sm">
-                                                <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${
-                                                    user.role === 'admin'
+                                                <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${user.role === 'admin'
                                                         ? 'bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-950/50 dark:text-purple-400 dark:border-purple-900/50'
                                                         : 'bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-400 dark:border-blue-900/50'
-                                                }`}>
+                                                    }`}>
                                                     {user.role}
                                                 </span>
                                             </td>
@@ -198,24 +196,22 @@ export default function AdminUsersClient({ initialUsers }) {
                                                 <div className="flex justify-end gap-2">
                                                     <button
                                                         disabled={actionLoading === userId}
-                                                        onClick={() => handleRoleChange(userId, user.role)}
-                                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                                                            user.role === 'admin'
+                                                        onClick={() => handleRoleChange(userId, user.userRole)}
+                                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${user.userRole === 'admin'
                                                                 ? 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'
                                                                 : 'bg-purple-600 text-white hover:bg-purple-700 dark:shadow-md dark:shadow-purple-900/20'
-                                                        }`}
+                                                            }`}
                                                     >
-                                                        {user.role === 'admin' ? 'Demote Admin' : 'Make Admin'}
+                                                        {user.userRole === 'admin' ? 'Demote Admin' : 'Make Admin'}
                                                     </button>
 
                                                     <button
                                                         disabled={actionLoading === userId}
                                                         onClick={() => handleToggleBlock(userId, user.banned)}
-                                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                                                            user.banned
+                                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${user.banned
                                                                 ? 'bg-green-600 text-white hover:bg-green-700 dark:bg-emerald-600'
                                                                 : 'bg-amber-500 text-white hover:bg-amber-600 dark:bg-amber-600'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {user.banned ? 'Unblock' : 'Block'}
                                                     </button>
@@ -244,31 +240,43 @@ export default function AdminUsersClient({ initialUsers }) {
                 <Card.Footer className="p-0" />
             </Card>
 
-            {/* 🛑 Dark Theme Aligned Delete Confirmation Modal */}
-            {deleteId && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
-                    <div className="bg-white dark:bg-[#161616] rounded-2xl p-6 w-[360px] shadow-2xl border border-neutral-100 dark:border-neutral-800">
-                        <h2 className="text-lg font-black text-neutral-900 dark:text-white">Delete User Account?</h2>
-                        <p className="text-sm text-gray-500 dark:text-neutral-400 mt-2 leading-relaxed">
-                            Are you sure you want to delete this user? All associated data will be permanently wiped.
-                        </p>
-                        <div className="flex justify-end gap-3 mt-6">
-                            <button
-                                onClick={() => setDeleteId(null)}
-                                className="px-4 py-2 text-xs font-bold rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 transition"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => handleDelete(deleteId)}
-                                className="px-4 py-2 text-xs font-bold rounded-xl bg-red-600 text-white hover:bg-red-700 transition shadow-sm dark:shadow-md dark:shadow-red-900/20"
-                            >
-                                Yes, Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <AlertDialog
+                isOpen={Boolean(deleteId)}
+                onOpenChange={(isOpen) => !isOpen && setDeleteId(null)}
+            >
+                <AlertDialog.Backdrop>
+                    <AlertDialog.Container>
+                        <AlertDialog.Dialog>
+                            <AlertDialog.Header>
+                                <AlertDialog.Heading>
+                                    Delete User Account
+                                </AlertDialog.Heading>
+                            </AlertDialog.Header>
+
+                            <AlertDialog.Body>
+                                Are you sure you want to permanently delete this user? This action cannot be undone.
+                            </AlertDialog.Body>
+
+                            <AlertDialog.Footer>
+                                <Button
+                                    variant="bordered"
+                                    onPress={() => setDeleteId(null)}
+                                >
+                                    Cancel
+                                </Button>
+
+                                <Button
+                                    className="bg-red-500 hover:bg-red-600 text-white font-medium"
+                                    onPress={handleDelete}
+                                >
+                                    Delete
+                                </Button>
+                            </AlertDialog.Footer>
+                        </AlertDialog.Dialog>
+                    </AlertDialog.Container>
+                </AlertDialog.Backdrop>
+            </AlertDialog>
         </div>
     );
 }
+

@@ -1,42 +1,36 @@
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
-import { role } from "better-auth/client";
 import { admin } from "better-auth/plugins";
 
-const client = new MongoClient(process.env.MONGO_DB_URI, {
-});
+const client = new MongoClient(process.env.MONGO_DB_URI, {});
 const db = client.db(process.env.AUTH_DB_NAME);
 
 export const auth = betterAuth({
-    emailAndPassword: { 
-    enabled: true, 
+  emailAndPassword: {
+    enabled: true,
   },
-  
+
   database: mongodbAdapter(db, {
-    // Optional: if you don't provide a client, database transactions won't be enabled.
     client
   }),
-  users: {
-    additionalFields: {
-    role: {
-      default: "buyer"
-    },
-      country: {
-        type: "string",
-        required: true 
-      },
-      address: {
-        type: "string",
-       required: true
-      },
-      phone: {
-        type: "string",
-        required: true
-      }
-   }},
-    plugins: [
-        admin()
-    ]
 
+  user: {
+    additionalFields: {
+      userRole: {
+        type: "string",
+        required: false,
+        defaultValue: "buyer",
+        input: true,
+      },
+      country: { type: "string", required: false, input: true },
+      address: { type: "string", required: false, input: true },
+      phone: { type: "string", required: false, input: true }
+    }
+  },
+  plugins: [
+    admin({
+    
+    })
+  ]
 });

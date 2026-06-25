@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 
 export const ProductCard = ({ product }) => {
+ 
     const productId = product._id?.$oid || product._id;
-    const isOutOfStock = product?.stock === 0 || product?.status === "sold";
+
+    const isOutOfStock = Number(product?.stock) === 0 || product?.status?.toLowerCase() === "sold";
 
     return (
         <motion.div
@@ -24,24 +26,22 @@ export const ProductCard = ({ product }) => {
                     />
                 </div>
 
-               
+
                 <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
-                    
-                  
-                    <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${
-                        isOutOfStock
+
+
+                    <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${isOutOfStock
                             ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/40'
                             : 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/40'
-                    }`}>
+                        }`}>
                         {isOutOfStock ? 'Stock Out' : `${product.stock} Left`}
                     </span>
 
-                    
-                    <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${
-                        product.condition === 'new'
+
+                    <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${product.condition === 'new'
                             ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40'
                             : 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40'
-                    }`}>
+                        }`}>
                         {product.condition}
                     </span>
                 </div>

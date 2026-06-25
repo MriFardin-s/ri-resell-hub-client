@@ -17,6 +17,7 @@ export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [selectedRole, setSelectedRole] = useState('buyer');
 
   const callbackUrl = searchParams.get('callbackUrl') || '/';
 
@@ -84,14 +85,16 @@ export default function SignUp() {
         }
       }
 
-      // Better Auth Submission
+     
       const { data, error: authError } = await signUp.email({
         email: email,
         password: password,
         name: name,
         image: imageUrl,
-        callbackURL: callbackUrl, 
-        role: role || 'buyer',
+        callbackURL: callbackUrl,
+
+      
+        userRole: selectedRole,
         country: country,
         address: address,
         phone: phone
@@ -123,7 +126,7 @@ export default function SignUp() {
     try {
       await signUp.social({
         provider: 'google',
-        callbackURL: callbackUrl, 
+        callbackURL: callbackUrl,
       });
     } catch (err) {
       setError('Google authentication failed. Please try again.');
@@ -239,34 +242,42 @@ export default function SignUp() {
               </div>
             </TextField>
 
-            {/* Role */}
+            {/* Role Section */}
             <div className="flex flex-col gap-2">
-              <Label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Role</Label>
-              <RadioGroup name="role" defaultValue="buyer" orientation="horizontal" className="flex flex-row space-x-6">
-                <Radio value="buyer">
-                  <Radio.Content className="flex items-center gap-2">
-                    <Radio.Control>
-                      <Radio.Indicator />
-                    </Radio.Control>
-                    <span className="text-sm font-medium text-neutral-700 dark:text-gray-200 hover:text-neutral-900 dark:hover:text-white cursor-pointer transition-colors">
-                      Buyer
-                    </span>
-                  </Radio.Content>
-                </Radio>
+              <label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Role</label>
 
-                <Radio value="seller">
-                  <Radio.Content className="flex items-center gap-2">
-                    <Radio.Control>
-                      <Radio.Indicator />
-                    </Radio.Control>
-                    <span className="text-sm font-medium text-neutral-700 dark:text-gray-200 hover:text-neutral-900 dark:hover:text-white cursor-pointer transition-colors">
-                      Seller
-                    </span>
-                  </Radio.Content>
-                </Radio>
-              </RadioGroup>
+              <div className="flex flex-row space-x-6">
+                {/* Buyer Radio */}
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="buyer"
+                    checked={selectedRole === 'buyer'}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className="w-4 h-4 text-yellow-400 bg-neutral-100 border-neutral-300 focus:ring-yellow-400 dark:focus:ring-yellow-400 dark:ring-offset-neutral-800 dark:bg-neutral-900 dark:border-neutral-700 accent-yellow-400 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium text-neutral-700 dark:text-gray-200 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
+                    Buyer
+                  </span>
+                </label>
+
+                {/* Seller Radio */}
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="seller"
+                    checked={selectedRole === 'seller'}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className="w-4 h-4 text-yellow-400 bg-neutral-100 border-neutral-300 focus:ring-yellow-400 dark:focus:ring-yellow-400 dark:ring-offset-neutral-800 dark:bg-neutral-900 dark:border-neutral-700 accent-yellow-400 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium text-neutral-700 dark:text-gray-200 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
+                    Seller
+                  </span>
+                </label>
+              </div>
             </div>
-
             {/* Password */}
             <TextField name="password" type={showPassword ? "text" : "password"} required className="w-full space-y-1">
               <Label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Password</Label>
@@ -294,7 +305,7 @@ export default function SignUp() {
               <FieldError />
             </TextField>
 
-            
+
             {error && (
               <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 flex items-start space-x-2.5 text-red-600 dark:text-red-400 text-xs my-2">
                 <TriangleExclamation className="w-4 h-4 mt-0.5 shrink-0" />
@@ -344,8 +355,8 @@ export default function SignUp() {
         <Card.Footer className="flex justify-center p-0 mt-6">
           <p className="text-xs text-neutral-500 dark:text-gray-400">
             Already have an account?{' '}
-            <Link 
-              href={`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`} 
+            <Link
+              href={`/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`}
               className="text-yellow-600 dark:text-yellow-400 font-bold hover:underline transition"
             >
               Sign In

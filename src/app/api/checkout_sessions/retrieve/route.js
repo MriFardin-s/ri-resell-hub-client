@@ -7,18 +7,30 @@ export async function GET(req) {
     const sessionId = searchParams.get('session_id');
 
     if (!sessionId) {
-      return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
+      return NextResponse.json({ success: false, message: 'Session ID is required' }, { status: 400 });
     }
 
-    
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
+    
+    const orderData = {
+      sessionId: session.id,
+      transactionId: session.payment_intent || session.id,
+      amount: session.amount_total / 100,
+      paymentStatus: session.payment_status === 'paid' ? 'paid' : session.payment_status,
+      createdAt: new Date().toISOString(), 
+      buyerInfo: {
+        email: session.metadata?.buyerMail || session.customer_details?.email || session.customer_email
+      }
+    };
+
     return NextResponse.json({
-      email: session.customer_email || session.metadata?.buyerMail || session.customer_details?.email,
-      paymentStatus: session.payment_status,
-      amount: session.amount_total / 100, 
+      success: true,
+      order: orderData
     });
+
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("Session retrieve error:", err);
+    return NextResponse.json({ success: false, message: err.message }, { status: 500 });
   }
 }

@@ -1,18 +1,16 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CircleCheck, House, ShoppingBag, Envelope, TriangleExclamation } from '@gravity-ui/icons';
 import Link from 'next/link';
 
 import { authClient } from '@/lib/auth-client';
 
-
 export function SuccessContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const sessionId = searchParams.get('session_id');
-
 
     const { data: sessionData, isPending } = authClient.useSession();
     const currentUser = sessionData?.user;
@@ -27,21 +25,34 @@ export function SuccessContent() {
             return;
         }
 
+       
         const processOrderAndFetchDetails = async () => {
             try {
-
-                const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/orders`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sessionId })
+                let res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/orders?session_id=${sessionId}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
                 });
 
-                const data = await res.json();
+                let data = await res.json();
+
+            
+                if (res.status === 404) {
+                    console.log("Order not found yet, retrying in 1.5 seconds...");
+
+               
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                
+                    res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/orders?session_id=${sessionId}`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    data = await res.json();
+                }
 
                 if (!res.ok) {
                     throw new Error(data.message || 'Failed to process order details.');
                 }
-
 
                 setOrderData(data.order || data.data || data);
             } catch (err) {
@@ -51,12 +62,10 @@ export function SuccessContent() {
             }
         };
 
-
         if (!isPending) {
             processOrderAndFetchDetails();
         }
     }, [sessionId, router, isPending]);
-
 
     if (loading || isPending) {
         return (
@@ -71,14 +80,25 @@ export function SuccessContent() {
         );
     }
 
+    if (error) {
+        return (
+            <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center p-4">
+                <div className="w-full max-w-md bg-white dark:bg-neutral-800 border border-red-200 dark:border-red-900/50 p-6 rounded-2xl text-center shadow-xl">
+                    <TriangleExclamation className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                    <h2 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">Something went wrong</h2>
+                    <p className="text-sm text-neutral-500 dark:text-gray-400 mb-6">{error}</p>
+                    <Link href="/" className="inline-flex h-11 items-center justify-center bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 font-medium px-6 rounded-xl text-sm transition hover:opacity-90">
+                        Back to Home
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     const buyerEmail = orderData?.buyerInfo?.email || orderData?.email;
 
-    // const buyerEmail = orderData?.buyerInfo?.email || orderData?.email || currentUser?.email;
-
-
-
-    if (!currentUser || (orderData && buyerEmail && buyerEmail !== currentUser.email)) {
+    
+    if (!currentUser || (orderData && buyerEmail && buyerEmail.toLowerCase() !== currentUser.email.toLowerCase())) {
         return (
             <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center p-4">
                 <div className="w-full max-w-md bg-white dark:bg-neutral-800 border border-red-200 dark:border-red-900/50 p-6 rounded-2xl text-center shadow-xl">
@@ -95,21 +115,9 @@ export function SuccessContent() {
         );
     }
 
-
-    if (error) {
-        return (
-            <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center p-4">
-                <div className="w-full max-w-md bg-white dark:bg-neutral-800 border border-red-200 dark:border-red-900/50 p-6 rounded-2xl text-center shadow-xl">
-                    <TriangleExclamation className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                    <h2 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">Something went wrong</h2>
-                    <p className="text-sm text-neutral-500 dark:text-gray-400 mb-6">{error}</p>
-                    <Link href="/" className="inline-flex h-11 items-center justify-center bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 font-medium px-6 rounded-xl text-sm transition hover:opacity-90">
-                        Back to Home
-                    </Link>
-                </div>
-            </div>
-        );
-    }
+  
+    const rawDate = orderData?.createdAt?.$date || orderData?.createdAt;
+    const formattedDate = rawDate ? new Date(rawDate).toLocaleDateString() : 'N/A';
 
     return (
         <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center p-4 relative overflow-hidden transition-colors">
@@ -130,8 +138,6 @@ export function SuccessContent() {
                     Thank you for your purchase. Your order has been confirmed successfully.
                 </p>
 
-
-
                 <div className="bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-200/60 dark:border-neutral-700 p-5 rounded-2xl mb-8 text-left space-y-4">
 
                     <div className="flex justify-between items-center">
@@ -144,12 +150,14 @@ export function SuccessContent() {
                     <div className="grid grid-cols-2 gap-4 border-t border-neutral-200 dark:border-neutral-700/60 pt-4">
                         <div>
                             <span className="text-[10px] text-neutral-400 font-medium block uppercase">Amount Paid</span>
-                            <span className="text-sm font-bold text-neutral-900 dark:text-white">${orderData?.amount || '0.00'}</span>
+                            <span className="text-sm font-bold text-neutral-900 dark:text-white">
+                                ${orderData?.amount ? orderData.amount.toFixed(2) : '0.00'}
+                            </span>
                         </div>
                         <div>
                             <span className="text-[10px] text-neutral-400 font-medium block uppercase">Date</span>
                             <span className="text-sm font-bold text-neutral-900 dark:text-white">
-                                {orderData?.createdAt ? new Date(orderData.createdAt).toLocaleDateString() : 'N/A'}
+                                {formattedDate}
                             </span>
                         </div>
                     </div>
@@ -166,13 +174,11 @@ export function SuccessContent() {
                         <div className="flex items-center gap-2 bg-white dark:bg-neutral-900 p-3 rounded-xl border border-neutral-200/50 dark:border-neutral-800">
                             <Envelope className="w-4 h-4 text-neutral-400 shrink-0" />
                             <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 truncate">
-                                {buyerEmail}
+                                {buyerEmail || currentUser?.email}
                             </span>
                         </div>
                     </div>
                 </div>
-
-
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full">
                     <Link

@@ -20,7 +20,7 @@ export default function ProductActions({ product, user }) {
     const [loading, setLoading] = useState(false);
 
     const isUserLoggedIn = user && user?.id;
-    const isNotBuyer = isUserLoggedIn && user?.role !== 'buyer';
+    const isNotBuyer = isUserLoggedIn && user?.userRole !== 'buyer';
     const isOutOfStock = product?.stock === undefined || product?.stock <= 0;
 
     const toastConfig = {

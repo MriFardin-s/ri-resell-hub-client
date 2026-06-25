@@ -1,5 +1,5 @@
-import { serverFetch } from "@/lib/core/server"
+import { serverFetch } from "@/lib/core/server";
 
-export const getSellerStats = async (id) =>{
-    return serverFetch(`/api/seller/stats/${id}`)
-}
+export const getSellerStats = async (id) => {
+  return serverFetch(`/api/seller/stats?userId=${id}`);
+};

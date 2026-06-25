@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Table } from '@heroui/react';
 import { toast } from 'react-hot-toast';
 import { Eye, Pencil, TrashBin } from '@gravity-ui/icons';
+import Link from 'next/link';
 
 export default function SellerProductsTable({ initialProducts }) {
     const [products, setProducts] = useState(initialProducts || []);
@@ -14,19 +15,40 @@ export default function SellerProductsTable({ initialProducts }) {
     );
 
     const handleDelete = async (id) => {
-        if (confirm("Are you sure you want to delete this product?")) {
-            try {
-                setProducts(prev => prev.filter(p => (p._id?.$oid || p._id) !== id));
-                toast.success("Product deleted successfully!");
-            } catch (error) {
-                toast.error("Failed to delete product");
+        const confirmed = window.confirm(
+            'Delete this product?'
+        );
+
+        if (!confirmed) return;
+
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`,
+                {
+                    method: 'DELETE',
+                }
+            );
+
+            const data = await res.json();
+
+            if (data.success) {
+                setProducts((prev) =>
+                    prev.filter(
+                        (p) =>
+                            (p._id?.$oid || p._id) !== id
+                    )
+                );
+
+                toast.success(
+                    'Product deleted successfully'
+                );
             }
+        } catch (error) {
+            toast.error('Failed to delete');
         }
     };
 
-    const handleEdit = (product) => {
-        toast(`Redirecting to edit page for: ${product.title}`, { icon: '📝' });
-    };
+   
 
     return (
         <div className="flex flex-col gap-4">
@@ -63,9 +85,9 @@ export default function SellerProductsTable({ initialProducts }) {
                                     return (
                                         <Table.Row key={id} className="border-b border-amber-5 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:bg-yellow-50/30 dark:hover:bg-neutral-800/50 transition-colors">
                                             <Table.Cell className="p-4 text-center">
-                                                <img 
-                                                    src={product.images?.[0] || 'https://placehold.co/50'} 
-                                                    alt={product.title} 
+                                                <img
+                                                    src={product.images?.[0] || 'https://placehold.co/50'}
+                                                    alt={product.title}
                                                     className="w-12 h-12 object-cover rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm mx-auto"
                                                 />
                                             </Table.Cell>
@@ -77,11 +99,10 @@ export default function SellerProductsTable({ initialProducts }) {
                                                 {product.category}
                                             </Table.Cell>
                                             <Table.Cell className="p-4 text-center text-sm">
-                                                <span className={`px-2.5 py-1 text-xs rounded-lg font-bold tracking-wide inline-block ${
-                                                    product.condition === 'new' 
-                                                        ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/50' 
-                                                        : 'bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/50'
-                                                }`}>
+                                                <span className={`px-2.5 py-1 text-xs rounded-lg font-bold tracking-wide inline-block ${product.condition === 'new'
+                                                    ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/50'
+                                                    : 'bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/50'
+                                                    }`}>
                                                     {product.condition}
                                                 </span>
                                             </Table.Cell>
@@ -98,25 +119,24 @@ export default function SellerProductsTable({ initialProducts }) {
                                             </Table.Cell>
                                             <Table.Cell className="p-4 text-center">
                                                 <div className="flex justify-center gap-2">
-                                                    <button 
-                                                        type="button"
+                                                    <Link
+                                                        href={`/products/${product._id}`}
                                                         className="px-3 py-1.5 text-xs font-bold bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-700 dark:text-neutral-300 transition-all"
                                                     >
-                                                        <Eye/> 
-                                                    </button>
-                                                    <button 
-                                                        type="button"
-                                                        onClick={() => handleEdit(product)}
-                                                        className="px-3 py-1.5 text-xs font-bold bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-700 dark:text-neutral-300 transition-all"
+                                                        <Eye />
+                                                    </Link>
+                                                    <Link
+                                                        href={`/dashboard/seller/products/edit/${id}`}
+                                                        className="px-3 py-1.5 text-xs font-bold bg-gray-50 border rounded-lg"
                                                     >
-                                                        <Pencil/> 
-                                                    </button>
-                                                    <button 
+                                                        <Pencil />
+                                                    </Link>
+                                                    <button
                                                         type="button"
                                                         onClick={() => handleDelete(id)}
                                                         className="px-3 py-1.5 text-xs font-bold bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/50 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 transition-all"
                                                     >
-                                                        <TrashBin/> 
+                                                        <TrashBin />
                                                     </button>
                                                 </div>
                                             </Table.Cell>

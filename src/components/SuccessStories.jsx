@@ -101,7 +101,7 @@ export default function SuccessStories() {
                 </div>
                 <div>
                   <h4 className="font-bold text-neutral-900 dark:text-neutral-100 text-base">{item.name}</h4>
-                  <p className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">{item.role}</p>
+                  <p className="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">{item.userRole}</p>
                 </div>
               </div>
             </motion.div>

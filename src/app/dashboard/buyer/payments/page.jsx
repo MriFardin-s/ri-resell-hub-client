@@ -4,15 +4,16 @@ import { getUserSession } from '@/lib/core/session';
 import { getPaymentHistory } from '@/lib/api/getPaymentHistory';
 import { redirect } from 'next/navigation';
 
-
-
 export default async function PaymentHistoryPage() {
   const user = await getUserSession();
-  
 
+  if (!user?.email) {
+    redirect('/login');
+  }
 
-
-  const payments = await getPaymentHistory(user?.email);
+  const payments = await getPaymentHistory(user?.email) || [];
+  console.log("Session User =", user);
+  console.log("Email =", user?.email);
 
   return (
     <div className="space-y-6 p-6 max-w-5xl mx-auto animate-in fade-in duration-300">
@@ -44,50 +45,49 @@ export default async function PaymentHistoryPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-neutral-800 text-sm">
-                {payments.map((payment) => (
-                  <tr key={payment._id} className="hover:bg-gray-50/50 dark:hover:bg-neutral-800/20 transition-colors">
-                 
-                    <td className="p-4">
-                      <div className="font-bold text-gray-900 dark:text-white">
-                        {payment.product?.title || "Premium Item"}
-                      </div>
-                      <div className="text-xs text-gray-400 mt-0.5">
-                        Seller: {payment.product?.seller?.name || "Unknown"}
-                      </div>
-                    </td>
-                    
-                
-                    <td className="p-4 font-mono text-xs text-gray-500 dark:text-neutral-400">
-                      {payment.stripeSessionId ? payment.stripeSessionId.substring(0, 18) + "..." : "N/A"}
-                    </td>
-                    
-                   
-                    <td className="p-4 text-gray-600 dark:text-neutral-300">
-                      {payment.createdAt ? new Date(payment.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      }) : "N/A"}
-                    </td>
-                    
-                  
-                    <td className="p-4 font-black text-gray-900 dark:text-white">
-                      ${payment.amountPaid?.toFixed(2) || "0.00"}
-                    </td>
-                    
-                  
-                    <td className="p-4">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${
-                        payment.paymentStatus === 'paid' 
-                          ? 'bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400' 
-                          : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400'
-                      }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${payment.paymentStatus === 'paid' ? 'bg-green-500' : 'bg-yellow-500'}`} />
-                        {payment.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {payments.map((payment) => {
+                  const paymentId = payment._id?.$oid || payment._id;
+                  const paymentDate = payment.createdAt?.$date || payment.createdAt;
+
+                  return (
+                    <tr key={paymentId} className="hover:bg-gray-50/50 dark:hover:bg-neutral-800/20 transition-colors">
+                      <td className="p-4">
+                        <div className="font-bold text-gray-900 dark:text-white">
+                          {payment.productDetails?.title || "Premium Item"}
+                        </div>
+                        <div className="text-xs text-gray-400 mt-0.5">
+                          Seller: {payment.sellerInfo?.name || "Unknown"}
+                        </div>
+                      </td>
+
+                      <td className="p-4 font-mono text-xs text-gray-500 dark:text-neutral-400 max-w-[200px] break-all whitespace-normal">
+                        {payment.sessionId || payment.transactionId || "N/A"}
+                      </td>
+
+                      <td className="p-4 text-gray-600 dark:text-neutral-300">
+                        {paymentDate ? new Date(paymentDate).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        }) : "N/A"}
+                      </td>
+
+                      <td className="p-4 font-black text-gray-900 dark:text-white">
+                        ${payment.amount ? payment.amount.toFixed(2) : "0.00"}
+                      </td>
+
+                      <td className="p-4">
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${payment.paymentStatus === 'paid'
+                            ? 'bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400'
+                            : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400'
+                          }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${payment.paymentStatus === 'paid' ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                          {payment.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

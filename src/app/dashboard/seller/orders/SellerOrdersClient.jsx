@@ -1,20 +1,15 @@
 'use client';
 
+import { CircleDashed } from '@gravity-ui/icons';
 import { useEffect, useState } from 'react';
 
 const STATUS_STYLES = {
-  pending:
-    'bg-amber-100 text-amber-700 border border-amber-200',
-  accepted:
-    'bg-blue-100 text-blue-700 border border-blue-200',
-  processing:
-    'bg-purple-100 text-purple-700 border border-purple-200',
-  shipped:
-    'bg-green-100 text-green-700 border border-green-200',
-  delivered:
-    'bg-emerald-100 text-emerald-700 border border-emerald-200',
-  cancelled:
-    'bg-red-100 text-red-700 border border-red-200',
+  pending: 'bg-amber-100 text-amber-700 border border-amber-200',
+  accepted: 'bg-blue-100 text-blue-700 border border-blue-200',
+  processing: 'bg-purple-100 text-purple-700 border border-purple-200',
+  shipped: 'bg-green-100 text-green-700 border border-green-200',
+  delivered: 'bg-emerald-100 text-emerald-700 border border-emerald-200',
+  cancelled: 'bg-red-100 text-red-700 border border-red-200',
 };
 
 export default function SellerOrdersClient({ user }) {
@@ -24,9 +19,7 @@ export default function SellerOrdersClient({ user }) {
   useEffect(() => {
     if (!user?.id) return;
 
-    fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/seller/orders/${user.id}`
-    )
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/seller/orders/${user.id}`)
       .then((res) => res.json())
       .then((data) => setOrders(data))
       .catch(console.error)
@@ -51,9 +44,7 @@ export default function SellerOrdersClient({ user }) {
       if (result.success) {
         setOrders((prev) =>
           prev.map((order) =>
-            order._id === orderId
-              ? { ...order, orderStatus: status }
-              : order
+            order._id === orderId ? { ...order, orderStatus: status } : order
           )
         );
       }
@@ -64,8 +55,14 @@ export default function SellerOrdersClient({ user }) {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-20">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-yellow-500 border-t-transparent" />
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <div className="relative">
+          <CircleDashed className="w-10 h-10 text-yellow-500 animate-spin" />
+          <div className="absolute inset-0 bg-yellow-500/20 blur-xl rounded-full animate-pulse" />
+        </div>
+        <p className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 animate-pulse tracking-wide">
+          Loading Orders...
+        </p>
       </div>
     );
   }
@@ -73,30 +70,19 @@ export default function SellerOrdersClient({ user }) {
   if (!orders.length) {
     return (
       <div className="text-center py-20">
-        <h3 className="text-xl font-semibold text-gray-700">
-          No Orders Found
-        </h3>
-        <p className="text-gray-500 mt-2">
-          You do not have any incoming orders yet.
-        </p>
+        <h3 className="text-xl font-semibold text-gray-700">No Orders Found</h3>
+        <p className="text-gray-500 mt-2">You do not have any incoming orders yet.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6 mx-5">
       <div>
-        <h1 className="text-3xl font-black text-gray-900">
-          Manage Orders
-        </h1>
-
-        <p className="text-gray-500 mt-1">
-          Handle incoming customer orders
-        </p>
+        <h1 className="text-3xl font-black text-gray-900 mt-6">Manage Orders</h1>
+        <p className="text-gray-500 mt-1">Handle incoming customer orders</p>
       </div>
 
-      {/* Orders */}
       <div className="space-y-5">
         {orders.map((order) => (
           <div
@@ -105,99 +91,54 @@ export default function SellerOrdersClient({ user }) {
           >
             <div className="p-6">
               <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
-                {/* Left Side */}
                 <div className="space-y-4 flex-1">
                   <div>
                     <h2 className="text-xl font-bold text-gray-900">
-                      {order.productDetails?.title}
+                      {order.productTitle}
                     </h2>
-
-                    <p className="text-sm text-gray-500">
-                      Order ID: {order._id}
-                    </p>
+                    <p className="text-sm text-gray-500">Order ID: {order._id}</p>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-5">
-                    {/* Buyer */}
                     <div>
-                      <h3 className="font-semibold mb-2 text-gray-900 ">
-                        Buyer Information
-                      </h3>
-
+                      <h3 className="font-semibold mb-2 text-gray-900">Buyer Information</h3>
                       <div className="space-y-1 text-sm text-gray-600">
                         <p>
-                          <span className="font-medium">
-                            Name:
-                          </span>{' '}
-                          {order.buyerInfo?.name ||
-                            'Unknown'}
+                          <span className="font-medium">Name:</span> {order.buyerInfo?.name || 'Unknown'}
                         </p>
-
                         <p>
-                          <span className="font-medium">
-                            Email:
-                          </span>{' '}
-                          {order.buyerInfo?.email}
+                          <span className="font-medium">Email:</span> {order.buyerInfo?.email}
                         </p>
-
                         <p>
-                          <span className="font-medium">
-                            Phone:
-                          </span>{' '}
-                          {order.buyerInfo?.phone}
+                          <span className="font-medium">Phone:</span> {order.buyerInfo?.phone}
                         </p>
-
                         <p>
-                          <span className="font-medium">
-                            Address:
-                          </span>{' '}
-                          {order.buyerInfo?.address}
+                          <span className="font-medium">Address:</span> {order.buyerInfo?.address}
                         </p>
                       </div>
                     </div>
 
-                    {/* Order Info */}
                     <div>
-                      <h3 className="font-semibold mb-2 text-gray-900 ">
-                        Order Information
-                      </h3>
-
+                      <h3 className="font-semibold mb-2 text-gray-900">Order Information</h3>
                       <div className="space-y-1 text-sm text-gray-600">
                         <p>
-                          <span className="font-medium">
-                            Amount:
-                          </span>{' '}
-                          ${order.amount}
+                          <span className="font-medium">Amount:</span> ${order.price}
                         </p>
-
                         <p>
-                          <span className="font-medium">
-                            Payment:
-                          </span>{' '}
-                          {order.paymentStatus}
+                          <span className="font-medium">Payment:</span> {order.paymentStatus}
                         </p>
-
                         <p>
-                          <span className="font-medium">
-                            Date:
-                          </span>{' '}
-                          {new Date(
-                            order.createdAt
-                          ).toLocaleDateString()}
+                          <span className="font-medium">Date:</span> {new Date(order.createdAt).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Right Side */}
                 <div className="flex flex-col gap-4 min-w-[220px]">
                   <span
                     className={`px-4 py-2 rounded-full text-sm font-semibold text-center ${
-                      STATUS_STYLES[
-                        order.orderStatus?.toLowerCase()
-                      ] ||
-                      'bg-gray-100 text-gray-700'
+                      STATUS_STYLES[order.orderStatus?.toLowerCase()] || 'bg-gray-100 text-gray-700'
                     }`}
                   >
                     {order.orderStatus}
@@ -207,24 +148,13 @@ export default function SellerOrdersClient({ user }) {
                     {order.orderStatus === 'pending' && (
                       <>
                         <button
-                          onClick={() =>
-                            updateStatus(
-                              order._id,
-                              'accepted'
-                            )
-                          }
+                          onClick={() => updateStatus(order._id, 'accepted')}
                           className="px-4 py-2 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
                         >
                           Accept
                         </button>
-
                         <button
-                          onClick={() =>
-                            updateStatus(
-                              order._id,
-                              'cancelled'
-                            )
-                          }
+                          onClick={() => updateStatus(order._id, 'cancelled')}
                           className="px-4 py-2 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 transition"
                         >
                           Reject
@@ -234,12 +164,7 @@ export default function SellerOrdersClient({ user }) {
 
                     {order.orderStatus === 'accepted' && (
                       <button
-                        onClick={() =>
-                          updateStatus(
-                            order._id,
-                            'processing'
-                          )
-                        }
+                        onClick={() => updateStatus(order._id, 'processing')}
                         className="px-4 py-2 rounded-xl bg-purple-600 text-white font-medium hover:bg-purple-700 transition"
                       >
                         Processing
@@ -248,12 +173,7 @@ export default function SellerOrdersClient({ user }) {
 
                     {order.orderStatus === 'processing' && (
                       <button
-                        onClick={() =>
-                          updateStatus(
-                            order._id,
-                            'shipped'
-                          )
-                        }
+                        onClick={() => updateStatus(order._id, 'shipped')}
                         className="px-4 py-2 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 transition"
                       >
                         Ship Order
@@ -262,12 +182,7 @@ export default function SellerOrdersClient({ user }) {
 
                     {order.orderStatus === 'shipped' && (
                       <button
-                        onClick={() =>
-                          updateStatus(
-                            order._id,
-                            'delivered'
-                          )
-                        }
+                        onClick={() => updateStatus(order._id, 'delivered')}
                         className="px-4 py-2 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition"
                       >
                         Mark Delivered
