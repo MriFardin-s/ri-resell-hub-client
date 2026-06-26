@@ -2,9 +2,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { Eye } from '@gravity-ui/icons';
 
 export const ProductCard = ({ product }) => {
- 
+
     const productId = product._id?.$oid || product._id;
 
     const isOutOfStock = Number(product?.stock) === 0 || product?.status?.toLowerCase() === "sold";
@@ -31,16 +32,16 @@ export const ProductCard = ({ product }) => {
 
 
                     <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${isOutOfStock
-                            ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/40'
-                            : 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/40'
+                        ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/40'
+                        : 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/40'
                         }`}>
                         {isOutOfStock ? 'Stock Out' : `${product.stock} Left`}
                     </span>
 
 
                     <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${product.condition === 'new'
-                            ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40'
-                            : 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40'
+                        : 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40'
                         }`}>
                         {product.condition}
                     </span>
@@ -86,9 +87,10 @@ export const ProductCard = ({ product }) => {
                     ) : (
                         <Link
                             href={`/products/${productId}`}
-                            className="w-full py-2.5 rounded-xl btn-theme-yellow text-center text-sm font-bold block"
+                            className="w-full py-2.5 rounded-xl btn-theme-yellow !flex items-center justify-center gap-2 text-sm font-bold"
                         >
-                            View Details
+                            <Eye className="w-4 h-4" />
+                            <span>View Details</span>
                         </Link>
                     )}
                 </div>

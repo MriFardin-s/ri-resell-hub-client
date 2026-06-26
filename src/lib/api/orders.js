@@ -1,6 +1,6 @@
-import { serverFetch } from "../core/server"
+import { protectedFetch } from "../core/server"
 
 
 export const getMyOrders = async (currentUserMail) =>{
-    return serverFetch(`/api/buyer/my-orders/${currentUserMail}`)
+    return protectedFetch(`/api/buyer/my-orders/${currentUserMail}`)
 }

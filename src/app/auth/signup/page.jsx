@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Button, Card, Form, TextField, Label, Input, Description, Radio, RadioGroup, FieldError, ListBoxItem, ListBox, SelectPopover, SelectValue, SelectTrigger, Select } from '@heroui/react';
+import { Button, Card, Form, TextField, Label, Input, Description, FieldError, ListBoxItem, ListBox, SelectPopover, SelectValue, SelectTrigger, Select } from '@heroui/react';
 import { ChevronLeft, Envelope, Key, Person, Plus, TriangleExclamation, CircleCheck, Eye, EyeSlash } from '@gravity-ui/icons';
-import { signUp } from '@/lib/auth-client';
+import { authClient, signUp } from '@/lib/auth-client';
 import Link from 'next/link';
 
 export default function SignUp() {
@@ -50,7 +50,7 @@ export default function SignUp() {
     setSuccess('');
 
     const formData = new FormData(e.currentTarget);
-    const { name, email, password, country, address, phone, role } = Object.fromEntries(formData.entries());
+    const { name, email, password, country, address, phone } = Object.fromEntries(formData.entries());
 
     // Password Validation Check
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -85,15 +85,12 @@ export default function SignUp() {
         }
       }
 
-     
       const { data, error: authError } = await signUp.email({
         email: email,
         password: password,
         name: name,
         image: imageUrl,
         callbackURL: callbackUrl,
-
-      
         userRole: selectedRole,
         country: country,
         address: address,
@@ -124,7 +121,7 @@ export default function SignUp() {
 
   const handleGoogleSignUp = async () => {
     try {
-      await signUp.social({
+      await authClient.signIn.social({
         provider: 'google',
         callbackURL: callbackUrl,
       });
@@ -177,7 +174,6 @@ export default function SignUp() {
               <div className="relative">
                 <Person className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-gray-500 w-4 h-4" />
                 <Input
-                  name="name"
                   placeholder="Enter your full name"
                   className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 hover:border-yellow-400/50 focus:border-yellow-400 transition-colors h-11 rounded-xl text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-gray-500 text-sm pl-11 pr-4 w-full outline-none"
                 />
@@ -192,7 +188,6 @@ export default function SignUp() {
               <div className="relative">
                 <Envelope className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-gray-500 w-4 h-4" />
                 <Input
-                  name="email"
                   placeholder="name@example.com"
                   className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 hover:border-yellow-400/50 focus:border-yellow-400 transition-colors h-11 rounded-xl text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-gray-500 text-sm pl-11 pr-4 w-full outline-none"
                 />
@@ -209,10 +204,10 @@ export default function SignUp() {
               </SelectTrigger>
               <SelectPopover className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 w-[var(--trigger-width)] rounded-xl mt-1 p-1 shadow-xl">
                 <ListBox>
-                  <ListBoxItem id="bd" className="text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 p-2 rounded-lg cursor-pointer">Bangladesh</ListBoxItem>
-                  <ListBoxItem id="in" className="text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 p-2 rounded-lg cursor-pointer">India</ListBoxItem>
-                  <ListBoxItem id="us" className="text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 p-2 rounded-lg cursor-pointer">United States</ListBoxItem>
-                  <ListBoxItem id="uk" className="text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 p-2 rounded-lg cursor-pointer">United Kingdom</ListBoxItem>
+                  <ListBoxItem id="bd" key="bd" className="text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 p-2 rounded-lg cursor-pointer">Bangladesh</ListBoxItem>
+                  <ListBoxItem id="in" key="in" className="text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 p-2 rounded-lg cursor-pointer">India</ListBoxItem>
+                  <ListBoxItem id="us" key="us" className="text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 p-2 rounded-lg cursor-pointer">United States</ListBoxItem>
+                  <ListBoxItem id="uk" key="uk" className="text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 p-2 rounded-lg cursor-pointer">United Kingdom</ListBoxItem>
                 </ListBox>
               </SelectPopover>
             </Select>
@@ -221,7 +216,6 @@ export default function SignUp() {
             <TextField name="address" className="w-full space-y-1">
               <Label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Address</Label>
               <Input
-                name="address"
                 placeholder="Enter your street address"
                 className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 h-11 rounded-xl text-neutral-900 dark:text-white text-sm px-4 w-full outline-none"
               />
@@ -235,7 +229,6 @@ export default function SignUp() {
                   +880
                 </span>
                 <Input
-                  name="phone"
                   placeholder="17XXXXXXXX"
                   className="bg-transparent text-neutral-900 dark:text-white text-sm px-4 w-full h-full outline-none placeholder:text-neutral-400 dark:placeholder:text-gray-600"
                 />
@@ -245,7 +238,6 @@ export default function SignUp() {
             {/* Role Section */}
             <div className="flex flex-col gap-2">
               <label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Role</label>
-
               <div className="flex flex-row space-x-6">
                 {/* Buyer Radio */}
                 <label className="flex items-center gap-2 cursor-pointer group">
@@ -255,7 +247,7 @@ export default function SignUp() {
                     value="buyer"
                     checked={selectedRole === 'buyer'}
                     onChange={(e) => setSelectedRole(e.target.value)}
-                    className="w-4 h-4 text-yellow-400 bg-neutral-100 border-neutral-300 focus:ring-yellow-400 dark:focus:ring-yellow-400 dark:ring-offset-neutral-800 dark:bg-neutral-900 dark:border-neutral-700 accent-yellow-400 cursor-pointer"
+                    className="w-4 h-4 text-yellow-400 bg-neutral-100 border-neutral-300 focus:ring-yellow-400 dark:focus:ring-yellow-400 dark:ring-offset-neutral-800 dark:bg-neutral-900/40 dark:border-neutral-700 accent-yellow-400 cursor-pointer"
                   />
                   <span className="text-sm font-medium text-neutral-700 dark:text-gray-200 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                     Buyer
@@ -270,7 +262,7 @@ export default function SignUp() {
                     value="seller"
                     checked={selectedRole === 'seller'}
                     onChange={(e) => setSelectedRole(e.target.value)}
-                    className="w-4 h-4 text-yellow-400 bg-neutral-100 border-neutral-300 focus:ring-yellow-400 dark:focus:ring-yellow-400 dark:ring-offset-neutral-800 dark:bg-neutral-900 dark:border-neutral-700 accent-yellow-400 cursor-pointer"
+                    className="w-4 h-4 text-yellow-400 bg-neutral-100 border-neutral-300 focus:ring-yellow-400 dark:focus:ring-yellow-400 dark:ring-offset-neutral-800 dark:bg-neutral-900/40 dark:border-neutral-700 accent-yellow-400 cursor-pointer"
                   />
                   <span className="text-sm font-medium text-neutral-700 dark:text-gray-200 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                     Seller
@@ -278,17 +270,16 @@ export default function SignUp() {
                 </label>
               </div>
             </div>
+
             {/* Password */}
             <TextField name="password" type={showPassword ? "text" : "password"} required className="w-full space-y-1">
               <Label className="text-neutral-700 dark:text-gray-300 font-medium text-xs pl-1">Password</Label>
               <div className="relative">
                 <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-gray-500 w-4 h-4" />
                 <Input
-                  name="password"
                   placeholder="Enter your password"
                   className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 hover:border-yellow-400/50 focus:border-yellow-400 transition-colors h-11 rounded-xl text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-gray-500 text-sm pl-11 pr-12 w-full outline-none"
                 />
-
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -297,14 +288,12 @@ export default function SignUp() {
                   {showPassword ? <EyeSlash className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-
               <p className="text-[10px] text-neutral-400 dark:text-gray-500 pl-1 pt-0.5">
                 Must be at least 8 characters with 1 capital letter and 1 number.
               </p>
               <Description />
               <FieldError />
             </TextField>
-
 
             {error && (
               <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 flex items-start space-x-2.5 text-red-600 dark:text-red-400 text-xs my-2">

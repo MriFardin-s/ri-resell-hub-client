@@ -4,7 +4,7 @@ import { AlertDialog, Button } from "@heroui/react";
 
 export default function CancelOrderDialog({ isOpen, onOpenChange, onConfirm, isCancelling }) {
   return (
-    // 💡 এখানে open={isOpen} এর জায়গায় isOpen={isOpen} ব্যবহার করুন
+
     <AlertDialog isOpen={isOpen} onOpenChange={onOpenChange}>
       <AlertDialog.Backdrop>
         <AlertDialog.Container>

@@ -1,7 +1,7 @@
 
 // const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-import { serverFetch } from "../core/server"
+import { protectedFetch, serverFetch } from "../core/server"
 
 
 // export const getProducts = async (productId, status= "pending") => {
@@ -13,13 +13,13 @@ import { serverFetch } from "../core/server"
 //     }
 
 
-export const getProducts = async (sellerId, status = "pending") => {
-    return serverFetch(`/api/products?sellerId=${sellerId}&status=${status}`);
+export const getProducts = async (sellerId) => {
+    return protectedFetch(`/api/products?sellerId=${sellerId}`);
 }
 
-export const getAllProducts = async (status = 'available,sold') => {
-    return serverFetch(`/api/all/products?status=${status}`)
-}
+export const getAllProducts = async (query = "") => {
+    return serverFetch(`/api/all/products?${query}`);
+};
 
 
 export const getAllProductsById = async (id) => {

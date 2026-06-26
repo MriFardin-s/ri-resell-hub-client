@@ -1,5 +1,5 @@
-import { serverFetch } from "../core/server"
+import { protectedFetch, serverFetch } from "../core/server"
 
 export const getWishlist = (currentUserMail) =>{
-    return serverFetch(`/api/wishlist/user/${currentUserMail}`)
+    return protectedFetch(`/api/wishlist/user/${currentUserMail}`)
 }

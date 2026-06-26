@@ -2,48 +2,96 @@
 import React, { useState, useEffect } from 'react';
 import { ProductCard } from '@/components/products/ProductCard';
 import { TextField, Label, InputGroup } from '@heroui/react';
+import { Pagination } from "@heroui/react";
 import { Magnifier, CircleXmarkFill } from '@gravity-ui/icons';
+import { useRouter } from 'next/navigation';
 
-export default function ProductExploreSection({ initialProducts }) {
-    const [displayedProducts, setDisplayedProducts] = useState(initialProducts);
-    const [search, setSearch] = useState('');
-    const [category, setCategory] = useState('all');
-    const [condition, setCondition] = useState('all');
+export default function ProductExploreSection({ products, filters, total }) {
+    const [search, setSearch] = useState(filters.search || "");
+    const [category, setCategory] = useState(filters.category || "all");
+    const [condition, setCondition] = useState(filters.condition || "all");
+    const [page, setPage] = useState(filters.page || 1);
 
-    const categories = ['all', ...new Set(initialProducts.map(p => p.category?.toLowerCase()).filter(Boolean))];
+    const categories = [
+        "all",
+        ...new Set(
+            (products || [])
+                .map((p) => p.category?.toLowerCase())
+                .filter(Boolean)
+        ),
+    ];
 
-    useEffect(() => {
-        let filtered = [...initialProducts];
+    const router = useRouter();
 
-        if (search && typeof search === 'string' && search.trim() !== '') {
-            filtered = filtered.filter(p =>
-                p.title?.toLowerCase().includes(search.toLowerCase()) ||
-                p.description?.toLowerCase().includes(search.toLowerCase())
-            );
+    const totalItems = total;
+    const itemsPerPage = 12;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    const startItem = (page - 1) * itemsPerPage + 1;
+    const endItem = Math.min(page * itemsPerPage, totalItems);
+
+    const getPageNumbers = () => {
+        const pages = [];
+
+        pages.push(1);
+
+        if (page > 3) pages.push("ellipsis");
+
+        const start = Math.max(2, page - 1);
+        const end = Math.min(totalPages - 1, page + 1);
+
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
         }
 
-        if (category !== 'all') {
-            filtered = filtered.filter(p => p.category?.toLowerCase() === category);
+        if (page < totalPages - 2) {
+            pages.push("ellipsis");
         }
 
-        if (condition !== 'all') {
-            filtered = filtered.filter(p => p.condition?.toLowerCase() === condition);
+        if (totalPages > 1) {
+            pages.push(totalPages);
         }
 
-        setDisplayedProducts(filtered);
-    }, [search, category, condition, initialProducts]);
-
-    const handleReset = () => {
-        setSearch('');
-        setCategory('all');
-        setCondition('all');
+        return pages;
     };
 
+    useEffect(() => {
+        const sp = new URLSearchParams();
+
+        if (search) {
+            sp.set("search", search);
+        }
+
+        if (category !== "all") {
+            sp.set("category", category);
+        }
+
+        if (condition !== "all") {
+            sp.set("condition", condition);
+        }
+
+        if (page > 1) {
+            sp.set("page", page);
+        }
+
+        router.push(`/products?${sp.toString()}`);
+    }, [search, category, condition, page, router]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [search, category, condition]);
+
+    const handleReset = () => {
+        setSearch("");
+        setCategory("all");
+        setCondition("all");
+        setPage(1);
+    };
     return (
         <>
             <div className="bg-white dark:bg-neutral-900 border border-amber-100 dark:border-neutral-800 rounded-3xl shadow-sm p-6 mb-8 transition-colors duration-300">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-end">
-                    
+
                     <div>
                         <TextField>
                             <Label className="text-xs font-bold text-gray-700 dark:text-neutral-300 uppercase tracking-wider mb-1.5 block">Search Product</Label>
@@ -51,8 +99,8 @@ export default function ProductExploreSection({ initialProducts }) {
                                 <InputGroup.Prefix className="pl-3 text-gray-400 dark:text-neutral-500 flex items-center">
                                     <Magnifier className="w-4 h-4" />
                                 </InputGroup.Prefix>
-                                <InputGroup.Input 
-                                    placeholder="Type to search..." 
+                                <InputGroup.Input
+                                    placeholder="Type to search..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     className="w-full h-full px-3 text-sm bg-transparent outline-none text-gray-800 dark:text-neutral-100 placeholder:text-gray-400 dark:placeholder:text-neutral-500"
@@ -102,18 +150,69 @@ export default function ProductExploreSection({ initialProducts }) {
                 </div>
             </div>
 
-            {displayedProducts.length === 0 ? (
+            {products.length === 0 ? (
                 <div className="text-center py-12 text-gray-500 dark:text-neutral-400 bg-white dark:bg-neutral-900 rounded-3xl border border-dashed border-gray-200 dark:border-neutral-800 transition-colors duration-300">
                     No products available matching your criteria.
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {displayedProducts.map((product) => {
-                        const productId = product._id?.$oid || product._id;
-                        return (
-                            <ProductCard key={productId} product={product} />
-                        );
-                    })}
+
+                    {products.map((product) => (
+                        <ProductCard
+                            key={product._id?.$oid || product._id}
+                            product={product}
+                        />
+                    ))}
+                </div>
+            )}
+            {totalPages > 1 && (
+                <div className="mt-10">
+                    <Pagination className="w-full">
+                        <Pagination.Summary>
+                            Showing {startItem}-{endItem} of {totalItems} products
+                        </Pagination.Summary>
+
+                        <Pagination.Content>
+
+                            <Pagination.Item>
+                                <Pagination.Previous
+                                    isDisabled={page === 1}
+                                    onPress={() => setPage((p) => p - 1)}
+                                >
+                                    <Pagination.PreviousIcon />
+                                    <span>Previous</span>
+                                </Pagination.Previous>
+                            </Pagination.Item>
+
+                            {getPageNumbers().map((p, i) =>
+                                p === "ellipsis" ? (
+                                    <Pagination.Item key={i}>
+                                        <Pagination.Ellipsis />
+                                    </Pagination.Item>
+                                ) : (
+                                    <Pagination.Item key={p}>
+                                        <Pagination.Link
+                                            isActive={page === p}
+                                            onPress={() => setPage(p)}
+                                        >
+                                            {p}
+                                        </Pagination.Link>
+                                    </Pagination.Item>
+                                )
+                            )}
+
+                            <Pagination.Item>
+                                <Pagination.Next
+                                    isDisabled={page === totalPages}
+                                    onPress={() => setPage((p) => p + 1)}
+                                >
+                                    <span>Next</span>
+                                    <Pagination.NextIcon />
+                                </Pagination.Next>
+                            </Pagination.Item>
+
+                        </Pagination.Content>
+                    </Pagination>
                 </div>
             )}
         </>

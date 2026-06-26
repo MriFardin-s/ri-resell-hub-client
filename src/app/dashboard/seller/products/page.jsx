@@ -6,6 +6,7 @@ import React from 'react';
 
 const SellerProducts = async () => {
     const allProducts = await getLoggedInSeller() || [];
+    // console.log(allProducts);
 
     return (
         <div className="w-full p-6 text-neutral-900 dark:text-neutral-100 transition-colors">

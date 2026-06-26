@@ -1,8 +1,8 @@
-import { serverFetch } from "../core/server"
+import { protectedFetch } from "../core/server"
 
 export const getPaymentHistory = async (email) => {
    
-    const res = await serverFetch(`/api/payments/buyer/${email}`, {
+    const res = await protectedFetch(`/api/payments/buyer/${email}`, {
         cache: 'no-store' 
     });
 

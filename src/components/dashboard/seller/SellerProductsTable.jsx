@@ -4,6 +4,7 @@ import { Table } from '@heroui/react';
 import { toast } from 'react-hot-toast';
 import { Eye, Pencil, TrashBin } from '@gravity-ui/icons';
 import Link from 'next/link';
+import { deleteProduct } from '@/lib/actions/seller/deleteProduct';
 
 export default function SellerProductsTable({ initialProducts }) {
     const [products, setProducts] = useState(initialProducts || []);
@@ -13,42 +14,51 @@ export default function SellerProductsTable({ initialProducts }) {
         product.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.category?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    const CONDITION_STYLES = {
+        new: "bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/50",
+
+        used: "bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/50",
+
+        draft: "bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50",
+    };
+
+    const STATUS_STYLES = {
+        pending: "bg-yellow-50 text-yellow-700 border border-yellow-200 dark:bg-yellow-950/40 dark:text-yellow-400 dark:border-yellow-900/50",
+
+        available: "bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/50",
+
+        sold: "bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50",
+
+        rejected: "bg-gray-100 text-gray-700 border border-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700",
+
+        draft: "bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50",
+    };
+
 
     const handleDelete = async (id) => {
-        const confirmed = window.confirm(
-            'Delete this product?'
-        );
+        const confirmed = window.confirm("Delete this product?");
 
         if (!confirmed) return;
 
         try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${id}`,
-                {
-                    method: 'DELETE',
-                }
-            );
+            const result = await deleteProduct(id);
 
-            const data = await res.json();
-
-            if (data.success) {
+            if (result.success) {
                 setProducts((prev) =>
                     prev.filter(
-                        (p) =>
-                            (p._id?.$oid || p._id) !== id
+                        (p) => (p._id?.$oid || p._id) !== id
                     )
                 );
 
-                toast.success(
-                    'Product deleted successfully'
-                );
+                toast.success("Product deleted successfully");
             }
         } catch (error) {
-            toast.error('Failed to delete');
+            console.error(error);
+            toast.error("Failed to delete");
         }
     };
 
-   
+
 
     return (
         <div className="flex flex-col gap-4">
@@ -99,10 +109,12 @@ export default function SellerProductsTable({ initialProducts }) {
                                                 {product.category}
                                             </Table.Cell>
                                             <Table.Cell className="p-4 text-center text-sm">
-                                                <span className={`px-2.5 py-1 text-xs rounded-lg font-bold tracking-wide inline-block ${product.condition === 'new'
-                                                    ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/50'
-                                                    : 'bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/50'
-                                                    }`}>
+                                                <span
+                                                    className={`px-2.5 py-1 text-xs rounded-lg font-bold tracking-wide inline-block ${CONDITION_STYLES[product.condition?.toLowerCase()] ||
+                                                        CONDITION_STYLES.draft
+
+                                                        }`}
+                                                >
                                                     {product.condition}
                                                 </span>
                                             </Table.Cell>
@@ -113,7 +125,11 @@ export default function SellerProductsTable({ initialProducts }) {
                                                 {product.stock}
                                             </Table.Cell>
                                             <Table.Cell className="p-4 text-center text-sm">
-                                                <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/40 px-2.5 py-1 border border-yellow-200 dark:border-yellow-900/50 rounded-full inline-block">
+                                                <span
+                                                    className={`px-2.5 py-1 text-xs rounded-full font-bold tracking-wide inline-block ${STATUS_STYLES[product.status?.toLowerCase()] ||
+                                                        STATUS_STYLES.draft
+                                                        }`}
+                                                >
                                                     {product.status}
                                                 </span>
                                             </Table.Cell>

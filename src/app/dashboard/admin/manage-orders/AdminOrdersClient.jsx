@@ -2,22 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { CircleDashed } from '@gravity-ui/icons';
+import { getOrderByAdmin } from '@/lib/api/admin/getOrderByAdmin';
+import { updateOrderStatus } from '@/lib/actions/admin/updateOrderStatus';
 
 export default function AdminOrdersClient() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchOrders();
-    }, []);
-
     const fetchOrders = async () => {
         try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/orders`
-            );
-
-            const data = await res.json();
+            const data = await getOrderByAdmin();
 
             setOrders(data || []);
         } catch (error) {
@@ -27,29 +21,19 @@ export default function AdminOrdersClient() {
         }
     };
 
+    useEffect(() => {
+        fetchOrders();
+    }, []);
+
     const updateStatus = async (id, status) => {
         try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/orders/${id}/status`,
-                {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ status }),
-                }
-            );
-
-            const result = await res.json();
+            const result = await updateOrderStatus (id, status);
 
             if (result.success) {
                 setOrders((prev) =>
                     prev.map((order) =>
                         order._id === id
-                            ? {
-                                ...order,
-                                orderStatus: status,
-                            }
+                            ? { ...order, orderStatus: status }
                             : order
                     )
                 );

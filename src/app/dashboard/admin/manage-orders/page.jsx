@@ -1,6 +1,7 @@
 import { getUserSession } from '@/lib/core/session';
 import { redirect } from 'next/navigation';
-import AdminOrdersClient from './AdminOrdersClien';
+import AdminOrdersClient from './AdminOrdersClient';
+
 
 
 const AdminManageOrder = async () => {

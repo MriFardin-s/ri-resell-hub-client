@@ -17,6 +17,7 @@ import {
 } from 'recharts';
 import { useEffect, useState } from 'react';
 import { CircleDashed } from '@gravity-ui/icons';
+import { getAnalytics } from '@/lib/api/admin/getAnalytics';
 
 const COLORS = ['#6366f1', '#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
 
@@ -30,22 +31,32 @@ export default function AdminAnalyticsClient() {
     const [isDarkMode, setIsDarkMode] = useState(false);
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/analytics`)
-            .then((res) => res.json())
-            .then((data) => setAnalytics(data))
-            .catch(console.error);
+        const fetchAnalytics = async () => {
+            try {
+                const data = await getAnalytics();
+                setAnalytics(data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
+        fetchAnalytics();
+    }, []);
+
+    useEffect(() => {
         const checkDarkMode = () => {
-            const isDark = document.documentElement.classList.contains('dark');
-            setIsDarkMode(isDark);
+            setIsDarkMode(
+                document.documentElement.classList.contains("dark")
+            );
         };
 
         checkDarkMode();
 
         const observer = new MutationObserver(checkDarkMode);
+
         observer.observe(document.documentElement, {
             attributes: true,
-            attributeFilter: ['class'],
+            attributeFilter: ["class"],
         });
 
         return () => observer.disconnect();
@@ -126,7 +137,7 @@ export default function AdminAnalyticsClient() {
                     </p>
                 </div>
 
-           
+
                 <div className="bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/60 rounded-2xl p-5 shadow-sm hover:shadow-md transition duration-300">
                     <h4 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Total Revenue</h4>
                     <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-500 mt-2">

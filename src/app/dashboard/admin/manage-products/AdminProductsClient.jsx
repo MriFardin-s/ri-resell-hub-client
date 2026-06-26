@@ -7,6 +7,9 @@ import {
     Button,
 } from '@heroui/react';
 import { CircleDashed } from '@gravity-ui/icons';
+import { getAllProducts } from '@/lib/api/admin/getAllProducts';
+import { updateProductStatus } from '@/lib/actions/admin/updateProductStatus';
+import { deleteProduct } from '@/lib/actions/admin/deleteProduct';
 
 export default function AdminProductsClient() {
     const [products, setProducts] = useState([]);
@@ -17,18 +20,11 @@ export default function AdminProductsClient() {
     const [isOpen, setIsOpen] =
         useState(false);
 
-    useEffect(() => {
-        fetchProducts();
-    }, []);
+
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/all/products`
-            );
-
-            const data = await res.json();
-
+            const data = await getAllProducts();
             setProducts(data || []);
         } catch (error) {
             console.error(error);
@@ -37,20 +33,15 @@ export default function AdminProductsClient() {
         }
     };
 
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+
+
     const handleStatus = async (id, action) => {
         try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/products/${id}/status`,
-                {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ action }),
-                }
-            );
-
-            const result = await res.json();
+            const result = await updateProductStatus(id, action);
 
             if (result.success) {
                 setProducts((prev) =>
@@ -59,38 +50,31 @@ export default function AdminProductsClient() {
                             ? {
                                 ...product,
                                 status:
-                                    action === 'approve'
-                                        ? 'available'
-                                        : 'rejected',
+                                    action === "approve"
+                                        ? "available"
+                                        : "rejected",
                             }
                             : product
                     )
                 );
             }
-            // console.log(products)
         } catch (error) {
             console.error(error);
         }
     };
 
+    
+
     const handleDelete = async () => {
         if (!deleteId) return;
 
         try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/products/${deleteId}`,
-                {
-                    method: 'DELETE',
-                }
-            );
-
-            const result = await res.json();
+            const result = await deleteProduct(deleteId);
 
             if (result.success) {
                 setProducts((prev) =>
                     prev.filter(
-                        (product) =>
-                            product._id !== deleteId
+                        (product) => product._id !== deleteId
                     )
                 );
             }
@@ -101,7 +85,6 @@ export default function AdminProductsClient() {
             console.error(error);
         }
     };
-
 
     const getStatusBadge = (status) => {
         switch (status?.toLowerCase()) {

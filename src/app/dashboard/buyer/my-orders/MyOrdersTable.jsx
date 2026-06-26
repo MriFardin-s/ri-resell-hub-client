@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { getMyOrders } from '@/lib/api/orders';
 import { toast } from 'react-hot-toast';
 import CancelOrderDialog from './CancelOrderDialog';
+import { myOrderCancel } from '@/lib/actions/buyer/myOrderCancel';
 
 export default function MyOrdersTable({ currentUserMail }) {
   const [orders, setOrders] = useState([]);
@@ -45,27 +46,29 @@ export default function MyOrdersTable({ currentUserMail }) {
     }
   }, [currentUserMail]);
 
+
   const handleCancelOrder = async (orderId) => {
     try {
       setActionLoading(orderId);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/orders/${orderId}/cancel`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const data = await res.json();
 
-      if (res.ok) {
+      const data = await myOrderCancel(orderId);
+
+      if (data.success) {
         setOrders(prevOrders =>
           prevOrders.map(order =>
-            order._id === orderId ? { ...order, orderStatus: 'cancelled' } : order
+            order._id === orderId
+              ? { ...order, orderStatus: "cancelled" }
+              : order
           )
         );
+
         toast.success(data.message || "Order cancelled successfully!");
         return true;
-      } else {
-        toast.error(data.message || "Failed to cancel order");
-        return false;
       }
+
+      toast.error(data.message || "Failed to cancel order");
+      return false;
+
     } catch (error) {
       console.error("Error cancelling order:", error);
       toast.error("Something went wrong while cancelling the order!");

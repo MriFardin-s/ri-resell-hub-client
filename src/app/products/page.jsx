@@ -1,26 +1,36 @@
-import { getAllProducts } from '@/lib/api/products';
-import React from 'react';
+import ProductExploreSection from "@/components/products/ProductExploreSection";
+import { getAllProducts } from "@/lib/api/products";
 
-import ProductExploreSection from '@/components/products/ProductExploreSection';
+export default async function AllProductsPage({ searchParams }) {
 
-const AllProductsPage = async () => {
-    
-    const products = await getAllProducts();
-    
+    const filters = await searchParams;
+
+    const filterObj = {
+        ...filters,
+        page: Number(filters.page) || 1,
+    };
+
+    const queryString = new URLSearchParams(filters).toString();
+
+    const { products, total } = await getAllProducts(queryString);
+
     return (
-        <div className="container mx-auto px-4 py-8 text-neutral-900 dark:text-neutral-100 transition-colors">
+        <div className="container mx-auto px-4 py-8 text-neutral-900 dark:text-neutral-100">
             <header className="mb-8 text-center">
-                <h1 className="text-3xl font-bold text-neutral-800 dark:text-white mb-2">
+                <h1 className="text-3xl font-bold">
                     Explore All Products
                 </h1>
-                <p className="text-neutral-500 dark:text-neutral-400">
+
+                <p className="text-neutral-500 dark:text-neutral-400 mt-2">
                     Find the best deals from trusted sellers
                 </p>
             </header>
 
-            <ProductExploreSection initialProducts={products} />
+            <ProductExploreSection
+                products={products || []} 
+                total={total}
+                filters={filterObj}
+            />
         </div>
     );
-};
-
-export default AllProductsPage;
+}

@@ -8,12 +8,12 @@ import {
 } from "@heroui/react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { updateProduct } from '@/lib/actions/seller/updateProduct';
 
 export default function EditProductForm({ product }) {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
-    
-    
+
     const [selectedCategory, setSelectedCategory] = useState(product?.category || "");
     const [selectedCondition, setSelectedCondition] = useState(product?.condition || "");
     const [errors, setErrors] = useState({});
@@ -25,7 +25,6 @@ export default function EditProductForm({ product }) {
         const formData = new FormData(e.currentTarget);
         const rawData = Object.fromEntries(formData.entries());
 
-      
         const categoryValue = selectedCategory && typeof selectedCategory === 'object'
             ? (selectedCategory.currentKey || Array.from(selectedCategory)[0] || "")
             : selectedCategory;
@@ -62,27 +61,22 @@ export default function EditProductForm({ product }) {
                 stock: Number(rawData.stock),
             };
 
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${product._id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updatedProductData),
-            });
+            const data = await updateProduct(
+                product._id,
+                updatedProductData
+            );
 
-            const data = await res.json();
-
-            if (data.success || res.ok) {
-                toast.success('Product updated successfully');
+            if (data.success) {
+                toast.success("Product updated successfully");
                 router.push("/dashboard/seller/products");
                 router.refresh();
             } else {
-                toast.error(data.message || 'Update failed');
+                toast.error(data.message || "Update failed");
                 setIsLoading(false);
             }
         } catch (error) {
             console.error("Update error:", error);
-            toast.error('An unexpected error occurred.');
+            toast.error("An unexpected error occurred.");
             setIsLoading(false);
         }
     };
@@ -94,6 +88,7 @@ export default function EditProductForm({ product }) {
             <Form onSubmit={handleSubmit} className="flex flex-col gap-6" validationErrors={errors} validationBehavior='aria'>
                 <Fieldset className="flex flex-col gap-5">
 
+                    {/* Product Title */}
                     <TextField defaultValue={product?.title} isInvalid={!!errors.title} errorMessage={errors.title} className="w-full flex flex-col gap-1.5">
                         <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400 pl-1">Product Title</Label>
                         <Input
@@ -104,14 +99,26 @@ export default function EditProductForm({ product }) {
                     </TextField>
 
                     {/* Description */}
-                    <TextField defaultValue={product?.description} isInvalid={!!errors.description} className="w-full flex flex-col gap-1.5">
-                        <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400 pl-1">Description</Label>
+                    <TextField
+                        isInvalid={!!errors.description}
+                        className="w-full flex flex-col gap-1.5"
+                    >
+                        <Label className="text-sm font-medium text-neutral-500 dark:text-gray-400 pl-1">
+                            Description
+                        </Label>
+
                         <textarea
                             name="description"
+                            defaultValue={product?.description}
                             placeholder="Describe your product..."
                             className="w-full p-3 h-28 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 text-sm outline-none focus:border-yellow-400/50 transition-all resize-none"
                         />
-                        {errors.description && <p className="text-xs text-red-500 pl-1">{errors.description}</p>}
+
+                        {errors.description && (
+                            <p className="text-xs text-red-500 pl-1">
+                                {errors.description}
+                            </p>
+                        )}
                     </TextField>
 
                     {/* Category */}
@@ -209,17 +216,17 @@ export default function EditProductForm({ product }) {
 
                 {/* Form Actions */}
                 <div className="flex justify-end gap-3 mt-4">
-                    <Button 
-                        type="button" 
-                        variant="flat" 
+                    <Button
+                        type="button"
+                        variant="flat"
                         onClick={() => router.push("/dashboard/seller/products")}
                         className="text-neutral-500 dark:text-gray-400 bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
                     >
                         Cancel
                     </Button>
-                    <Button 
-                        type="submit" 
-                        isLoading={isLoading} 
+                    <Button
+                        type="submit"
+                        isLoading={isLoading}
                         className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold transition-colors"
                     >
                         Update Product

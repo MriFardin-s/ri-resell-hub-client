@@ -57,7 +57,7 @@ export default function Hero() {
               <Link href="/products" className="btn-theme-yellow px-8 py-4 rounded-xl text-center font-bold text-base transition-all hover:scale-105">
                 Explore Products
               </Link>
-              <Link href="/dashboard" className="bg-neutral-900 dark:bg-neutral-800 text-white hover:bg-neutral-800 dark:hover:bg-neutral-700 px-8 py-4 rounded-xl text-center font-bold text-base transition-all hover:scale-105 shadow-md">
+              <Link href="/dashboard/seller/products/new" className="bg-neutral-900 dark:bg-neutral-800 text-white hover:bg-neutral-800 dark:hover:bg-neutral-700 px-8 py-4 rounded-xl text-center font-bold text-base transition-all hover:scale-105 shadow-md">
                 Start Selling
               </Link>
             </motion.div>

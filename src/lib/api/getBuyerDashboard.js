@@ -1,5 +1,5 @@
-import { serverFetch } from "../core/server"
+import { protectedFetch } from "../core/server"
 
 export const getBuyerDashboard = async (currentUserMail) =>{
-    return serverFetch(`/api/buyer/dashboard-summary?email=${currentUserMail}`)
+    return protectedFetch(`/api/buyer/dashboard-summary?email=${currentUserMail}`)
 }
