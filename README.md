@@ -6,9 +6,9 @@ A modern full-stack resale marketplace where users can buy and sell second-hand 
 
 ## 🚀 Live URL
 
-**Client:** [https://your-client-url.vercel.app](https://ri-resell-hub-client.vercel.app/)
+**Client:** [https://client-url.vercel.app](https://ri-resell-hub-client.vercel.app/)
 
-**Server:** [https://your-server-url.onrender.com](https://ri-resell-hub-server.vercel.app/)
+**Server:** [https://server-url.onrender.com](https://ri-resell-hub-server.vercel.app/)
 
 ---
 
