@@ -5,6 +5,9 @@ import { useMemo, useState } from 'react';
 import { Card, Button, AlertDialog } from "@heroui/react";
 import toast from 'react-hot-toast';
 import { CircleDashed } from '@gravity-ui/icons';
+import { deleteUser } from '@/lib/actions/admin/deleteUser';
+import { toggleUserStatus } from '@/lib/actions/admin/toggleUserStatus';
+import { updateUserRole } from '@/lib/actions/admin/updateUserRole';
 
 export default function AdminUsersClient({ initialUsers }) {
     const [users, setUsers] = useState(initialUsers || []);
@@ -21,70 +24,79 @@ export default function AdminUsersClient({ initialUsers }) {
     }, [users, search]);
 
     const handleDelete = async () => {
-        if (!deleteId) return toast.error("Invalid User ID");
-        try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/users/${deleteId}`, {
-                method: 'DELETE',
-            });
+        if (!deleteId) {
+            return toast.error("Invalid User ID");
+        }
 
-            const result = await res.json();
+        try {
+            const result = await deleteUser(deleteId);
 
             if (result.success) {
-                setUsers((prev) => prev.filter((user) => user.id !== deleteId && user._id !== deleteId));
-                toast.success(result.message || 'User deleted successfully');
+                setUsers((prev) =>
+                    prev.filter(
+                        (user) =>
+                            user.id !== deleteId &&
+                            user._id !== deleteId
+                    )
+                );
+
+                toast.success(result.message || "User deleted successfully");
             } else {
-                toast.error(result.message || 'Failed to delete user');
+                toast.error(result.message || "Failed to delete user");
             }
         } catch (error) {
-            console.error('Delete error:', error);
-            toast.error('Something went wrong!');
+            console.error(error);
+            toast.error("Something went wrong!");
         } finally {
             setDeleteId(null);
         }
     };
 
     const handleToggleBlock = async (id, isBlocked) => {
-        if (!id) return toast.error("User ID is missing!");
+        if (!id) {
+            return toast.error("User ID is missing!");
+        }
+
         try {
             setActionLoading(id);
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/users/${id}/status`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ banned: !isBlocked }),
-            });
 
-            const result = await res.json();
+            const result = await toggleUserStatus(id, !isBlocked);
 
             if (result.success) {
                 setUsers((prev) =>
                     prev.map((user) =>
-                        (user.id === id || user._id === id) ? { ...user, banned: !isBlocked } : user
+                        (user.id === id || user._id === id)
+                            ? { ...user, banned: !isBlocked }
+                            : user
                     )
                 );
+
                 toast.success(result.message);
             } else {
                 toast.error(result.message);
             }
         } catch (error) {
-            console.error('Block toggle error:', error);
-            toast.error('Failed to update status');
+            console.error(error);
+            toast.error("Failed to update status");
         } finally {
             setActionLoading(null);
         }
     };
 
     const handleRoleChange = async (id, currentRole) => {
-        if (!id) return toast.error("User ID is missing!");
-        const actionType = currentRole === 'admin' ? 'remove_admin' : 'make_admin';
+        if (!id) {
+            return toast.error("User ID is missing!");
+        }
+
+        const actionType =
+            currentRole === "admin"
+                ? "remove_admin"
+                : "make_admin";
+
         try {
             setActionLoading(id);
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/users/${id}/status`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: actionType }),
-            });
 
-            const result = await res.json();
+            const result = await updateUserRole(id, actionType);
 
             if (result.success) {
                 setUsers((prev) =>
@@ -92,18 +104,22 @@ export default function AdminUsersClient({ initialUsers }) {
                         (user.id === id || user._id === id)
                             ? {
                                 ...user,
-                                userRole: actionType === 'make_admin' ? 'admin' : (user.previousRole || 'buyer'),
+                                userRole:
+                                    actionType === "make_admin"
+                                        ? "admin"
+                                        : (user.previousRole || "buyer"),
                             }
                             : user
                     )
                 );
+
                 toast.success(result.message);
             } else {
                 toast.error(result.message);
             }
         } catch (error) {
-            console.error('Role update error:', error);
-            toast.error('Failed to update user role');
+            console.error(error);
+            toast.error("Failed to update user role");
         } finally {
             setActionLoading(null);
         }
@@ -169,10 +185,10 @@ export default function AdminUsersClient({ initialUsers }) {
 
                                             <td className="p-4 text-sm">
                                                 <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${user.role === 'admin'
-                                                        ? 'bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-950/50 dark:text-purple-400 dark:border-purple-900/50'
-                                                        : 'bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-400 dark:border-blue-900/50'
+                                                    ? 'bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-950/50 dark:text-purple-400 dark:border-purple-900/50'
+                                                    : 'bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-400 dark:border-blue-900/50'
                                                     }`}>
-                                                    {user.role}
+                                                    {user.userRole}
                                                 </span>
                                             </td>
 
@@ -198,8 +214,8 @@ export default function AdminUsersClient({ initialUsers }) {
                                                         disabled={actionLoading === userId}
                                                         onClick={() => handleRoleChange(userId, user.userRole)}
                                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${user.userRole === 'admin'
-                                                                ? 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'
-                                                                : 'bg-purple-600 text-white hover:bg-purple-700 dark:shadow-md dark:shadow-purple-900/20'
+                                                            ? 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'
+                                                            : 'bg-purple-600 text-white hover:bg-purple-700 dark:shadow-md dark:shadow-purple-900/20'
                                                             }`}
                                                     >
                                                         {user.userRole === 'admin' ? 'Demote Admin' : 'Make Admin'}
@@ -209,8 +225,8 @@ export default function AdminUsersClient({ initialUsers }) {
                                                         disabled={actionLoading === userId}
                                                         onClick={() => handleToggleBlock(userId, user.banned)}
                                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${user.banned
-                                                                ? 'bg-green-600 text-white hover:bg-green-700 dark:bg-emerald-600'
-                                                                : 'bg-amber-500 text-white hover:bg-amber-600 dark:bg-amber-600'
+                                                            ? 'bg-green-600 text-white hover:bg-green-700 dark:bg-emerald-600'
+                                                            : 'bg-amber-500 text-white hover:bg-amber-600 dark:bg-amber-600'
                                                             }`}
                                                     >
                                                         {user.banned ? 'Unblock' : 'Block'}

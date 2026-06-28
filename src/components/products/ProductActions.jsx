@@ -6,18 +6,15 @@ import { useRouter, useParams } from 'next/navigation';
 import { getCheckWishlist } from '@/lib/api/checkWishlist';
 import { updateWishlist } from '@/lib/actions/wishlist';
 
-
 export default function ProductActions({ product, user }) {
     const router = useRouter();
     const params = useParams();
     const id = params?.id;
-    
 
     const productId = product?._id?.$oid || product?._id || id;
 
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    const [loading, setLoading] = useState(false);
 
     const isUserLoggedIn = user && user?.id;
     const isNotBuyer = isUserLoggedIn && user?.userRole !== 'buyer';
@@ -32,20 +29,20 @@ export default function ProductActions({ product, user }) {
             if (isUserLoggedIn && !isNotBuyer && productId) {
                 try {
                     const userId = user.id;
-                    const data = await getCheckWishlist(userId, productId); 
+                    const data = await getCheckWishlist(userId, productId);
                     if (data && data.isWishlisted !== undefined) {
                         setIsWishlisted(data.isWishlisted);
                     }
                 } catch (err) {
-                    console.error(err);
+                    console.error("Wishlist sync error: ", err);
                 }
             }
         };
         checkWishlistStatus();
+    }, [isUserLoggedIn, isNotBuyer, productId]);
 
-    }, [isUserLoggedIn, isNotBuyer, user?.id, productId]);
 
-    const handleOrderNow = () => {
+    const handleOrderClick = () => {
         if (!isUserLoggedIn) {
             toast.error('Please signin first to place an order!', {
                 icon: <LockFill className="w-5 h-5 text-red-500 dark:text-red-400" />,
@@ -66,47 +63,13 @@ export default function ProductActions({ product, user }) {
             toast.error(`This product is currently out of stock!`, { ...toastConfig });
             return;
         }
-        setShowModal(true);
-    };
-
-    const handleCheckoutSubmit = async (e) => {
-        e.preventDefault();
+        
         if (!user?.address?.trim() || user?.address === 'Not Provided') {
             toast.error('Please update your profile with a valid delivery address first!', { ...toastConfig });
             return;
         }
-        setLoading(true);
-        try {
-            const response = await fetch('/api/checkout_sessions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    product: {
-                        id: productId, 
-                        title: product.title,
-                        price: product.price,
-                        image: product.images?.[0] || product.image,
-                        sellerInfo: product.sellerInfo
-                    },
-                    buyer: {
-                        id: user.id,
-                        name: user.name,
-                        email: user.email,
-                        phone: user.phone || 'Not Provided',
-                        address: user.address
-                    }
-                })
-            });
-            const data = await response.json();
-            if (data.url) {
-                window.location.href = data.url;
-            } else {
-                throw new Error(data.error || 'Checkout failed');
-            }
-        } catch (err) {
-            toast.error(err.message, { ...toastConfig });
-            setLoading(false);
-        }
+
+        setShowModal(true);
     };
 
     const handleWishlist = async () => {
@@ -127,7 +90,7 @@ export default function ProductActions({ product, user }) {
 
         try {
             const userId = user.id;
-            await updateWishlist(userId, productId); 
+            await updateWishlist(userId, productId);
 
             setIsWishlisted(!isWishlisted);
             if (!isWishlisted) {
@@ -151,10 +114,9 @@ export default function ProductActions({ product, user }) {
             <div className="flex items-center gap-4 pt-4">
                 <button
                     type="button"
-                    onClick={handleOrderNow}
+                    onClick={handleOrderClick} 
                     disabled={isNotBuyer || isOutOfStock}
-                    className={`flex-1 h-14 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all duration-300 
-                        ${(isNotBuyer || isOutOfStock)
+                    className={`flex-1 h-14 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all duration-300 ${(isNotBuyer || isOutOfStock)
                             ? 'bg-gray-200 dark:bg-neutral-800 text-gray-400 dark:text-neutral-600 cursor-not-allowed shadow-none'
                             : 'bg-theme-yellow-primary hover:bg-theme-yellow-hover text-gray-900 shadow-lg shadow-theme-yellow-primary/20 active:scale-[0.98]'
                         }`}
@@ -167,7 +129,7 @@ export default function ProductActions({ product, user }) {
                     type="button"
                     onClick={handleWishlist}
                     disabled={isNotBuyer}
-                    className={`w-14 h-14 rounded-2xl border flex items-center justify-center active:scale-[0.98] transition-all duration-200 shadow-sm 
+                    className={`w-14 h-14 rounded-2xl border flex items-center justify-center active:scale-[0.98] transition-all duration-200 shadow-sm \
                         ${isNotBuyer
                             ? 'bg-gray-50 dark:bg-neutral-900/50 border-gray-200 dark:border-neutral-800 text-gray-300 dark:text-neutral-700 cursor-not-allowed'
                             : isWishlisted
@@ -179,11 +141,27 @@ export default function ProductActions({ product, user }) {
                 </button>
             </div>
 
+           
             {showModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
                     <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-gray-100 dark:border-neutral-800 text-gray-900 dark:text-white">
                         <h3 className="text-xl font-bold mb-4">Confirm Order Details</h3>
-                        <form onSubmit={handleCheckoutSubmit} className="space-y-4">
+
+                        <form action="/api/checkout_sessions" method="POST" className="space-y-4">
+                        
+                            <input type="hidden" name="productId" value={productId} />
+                            <input type="hidden" name="productTitle" value={product.title || ''} />
+                            <input type="hidden" name="productPrice" value={product.price || 0} />
+                            <input type="hidden" name="productImage" value={product.images?.[0] || product.image || ''} />
+                            <input type="hidden" name="sellerId" value={product.sellerInfo?.id || product.sellerInfo?._id || ''} />
+
+                            <input type="hidden" name="buyerId" value={user?.id || ''} />
+                            <input type="hidden" name="buyerName" value={user?.name || ''} />
+                            <input type="hidden" name="buyerEmail" value={user?.email || ''} />
+                            <input type="hidden" name="buyerPhone" value={user?.phone || 'Not Provided'} />
+                            <input type="hidden" name="buyerAddress" value={user?.address || ''} />
+
+                           
                             <div>
                                 <label className="block text-xs font-semibold text-gray-400 uppercase">Buyer Name</label>
                                 <input type="text" value={user?.name || ''} disabled className="w-full mt-1 p-3 bg-gray-50 dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 cursor-not-allowed text-gray-400" />
@@ -191,10 +169,6 @@ export default function ProductActions({ product, user }) {
                             <div>
                                 <label className="block text-xs font-semibold text-gray-400 uppercase">Email Address</label>
                                 <input type="email" value={user?.email || ''} disabled className="w-full mt-1 p-3 bg-gray-50 dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 cursor-not-allowed text-gray-400" />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-semibold text-gray-400 uppercase">Phone Number</label>
-                                <input type="text" value={user?.phone || 'Not Provided'} disabled className="w-full mt-1 p-3 bg-gray-50 dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 cursor-not-allowed text-gray-400" />
                             </div>
                             <div>
                                 <label className="block text-xs font-semibold text-gray-400 uppercase">Delivery Address</label>
@@ -216,8 +190,8 @@ export default function ProductActions({ product, user }) {
                                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 h-12 border border-gray-300 dark:border-neutral-700 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-neutral-800 transition">
                                     Cancel
                                 </button>
-                                <button type="submit" disabled={loading} className="flex-1 h-12 bg-theme-yellow-primary hover:bg-theme-yellow-hover text-gray-900 font-bold rounded-xl transition flex items-center justify-center">
-                                    {loading ? 'Connecting...' : 'Proceed to Stripe'}
+                                <button type="submit" className="flex-1 h-12 bg-theme-yellow-primary hover:bg-theme-yellow-hover text-gray-900 font-bold rounded-xl transition flex items-center justify-center">
+                                    Proceed to Stripe
                                 </button>
                             </div>
                         </form>

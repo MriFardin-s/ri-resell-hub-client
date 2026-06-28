@@ -1,11 +1,16 @@
 import SellerProductsTable from '@/components/dashboard/seller/SellerProductsTable';
 import { getLoggedInSeller } from '@/lib/api/getLoggedInSeller';
-import { getProducts } from '@/lib/api/products';
-import { getUserSession } from '@/lib/core/session';
+
 import React from 'react';
 
 const SellerProducts = async () => {
     const allProducts = await getLoggedInSeller() || [];
+    console.log(
+  allProducts.map((p) => ({
+    title: p.title,
+    status: p.status,
+  }))
+);
     // console.log(allProducts);
 
     return (

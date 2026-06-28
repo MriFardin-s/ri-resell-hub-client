@@ -12,8 +12,8 @@ export default async function PaymentHistoryPage() {
   }
 
   const payments = await getPaymentHistory(user?.email) || [];
-  console.log("Session User =", user);
-  console.log("Email =", user?.email);
+  // console.log("Session User =", user);
+  // console.log("Email =", user?.email);
 
   return (
     <div className="space-y-6 p-6 max-w-5xl mx-auto animate-in fade-in duration-300">
@@ -61,7 +61,7 @@ export default async function PaymentHistoryPage() {
                       </td>
 
                       <td className="p-4 font-mono text-xs text-gray-500 dark:text-neutral-400 max-w-[200px] break-all whitespace-normal">
-                        {payment.sessionId || payment.transactionId || "N/A"}
+                        { payment.transactionId || "N/A"}
                       </td>
 
                       <td className="p-4 text-gray-600 dark:text-neutral-300">

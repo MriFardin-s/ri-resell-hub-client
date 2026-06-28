@@ -5,9 +5,9 @@ import Link from "next/link";
 
 export default async function PopularCategories() {
   const categories = await getPopularCategories();
-  console.log(categories);
-console.log(typeof categories);
-console.log(Array.isArray(categories));
+//   console.log(categories);
+// console.log(typeof categories);
+// console.log(Array.isArray(categories));
 
   return (
     <section className="max-w-7xl mx-auto py-16 px-4">

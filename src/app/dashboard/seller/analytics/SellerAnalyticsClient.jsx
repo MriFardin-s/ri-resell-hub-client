@@ -43,11 +43,13 @@ export default function SellerAnalyticsClient({ user }) {
                 const productsArray = Array.isArray(products) ? products : [];
 
                 const formatted = salesArray.map((item) => {
-                    const monthIndex = item._id?.month !== undefined ? (item._id.month - 1 >= 0 ? item._id.month - 1 : item._id.month) : 0;
+                    const rawMonth = item.month; 
+                    const monthIndex = typeof rawMonth === 'number' ? rawMonth - 1 : 0;
+                    
                     return {
                         month: MONTHS[monthIndex] || 'Jan',
-                        revenue: item.totalRevenue || item.revenue || 0,
-                        sales: item.totalSales || item.sales || 0,
+                        revenue: item.totalRevenue || 0,
+                        sales: item.totalSales || 0,
                     };
                 });
 
@@ -156,7 +158,7 @@ export default function SellerAnalyticsClient({ user }) {
                         Monthly Sales Volume
                     </h3>
                     <div className="h-[320px]">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer className="w-full h-80">
                             <BarChart data={salesData} margin={{ left: -20, right: 10 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                                 <XAxis dataKey="month" tick={{ fill: tickColor, fontSize: 12 }} stroke={gridColor} />
@@ -186,7 +188,7 @@ export default function SellerAnalyticsClient({ user }) {
                     ) : (
                         topProducts.map((product, index) => (
                             <div
-                                key={product._id || index}
+                                key={product.id || index}
                                 className="flex items-center justify-between border border-neutral-100 dark:border-neutral-800/60 bg-neutral-50/50 dark:bg-neutral-950/40 rounded-xl p-4 hover:border-amber-500/40 dark:hover:border-amber-500/30 transition duration-300"
                             >
                                 <div className="space-y-1 pr-4 truncate">
@@ -195,16 +197,16 @@ export default function SellerAnalyticsClient({ user }) {
                                             #{index + 1}
                                         </span>
                                         <p className="font-semibold text-neutral-900 dark:text-neutral-100 truncate">
-                                            {product.title || product.productTitle || product.productDetails?.title || "Premium Product"}
+                                            {product.title || "Premium Product"}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="text-right flex-shrink-0">
                                     <p className="font-bold text-neutral-900 dark:text-neutral-100">
-                                        {product.sales || product.totalSales || 0} Sales
+                                        {product.sales || 0} Sales
                                     </p>
                                     <p className="text-xs font-medium text-emerald-600 dark:text-emerald-500 mt-0.5">
-                                        ${(product.revenue || product.totalRevenue || 0).toLocaleString()}
+                                        ${(product.revenue || 0).toLocaleString()}
                                     </p>
                                 </div>
                             </div>

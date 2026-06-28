@@ -25,7 +25,8 @@ export default function AdminProductsClient() {
     const fetchProducts = async () => {
         try {
             const data = await getAllProducts();
-            setProducts(data || []);
+            const products = data.products
+            setProducts(products || []);
         } catch (error) {
             console.error(error);
         } finally {
