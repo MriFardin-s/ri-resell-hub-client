@@ -133,13 +133,8 @@ export default async function SuccessPage({ searchParams }) {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3 w-full">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Link
-                href={`/dashboard/my-orders?session_id=${session_id}`}
-                className="h-11 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 text-neutral-800 dark:text-neutral-200 font-bold rounded-xl flex items-center justify-center transition text-sm shadow-sm active:scale-[0.98]"
-              >
-                View Order Details
-              </Link>
+            <div className="gap-3">
+             
 
               <Link
                 href="/dashboard/buyer/my-orders"

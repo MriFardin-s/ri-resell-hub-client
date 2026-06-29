@@ -10,8 +10,9 @@ const ProductDetailsPage = async ({ params }) => {
     const { id } = await params;
     const product = await getAllProductsById(id);
     const user = await getUserSession();
+    console.log(product)
 
-    // if (!product) {
+    // if (!product.ok) {
     //     return (
     //         <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-900 transition-colors">
     //             <p className="text-gray-500 dark:text-neutral-400 font-medium">Product not found!</p>
@@ -19,9 +20,9 @@ const ProductDetailsPage = async ({ params }) => {
     //     );
     // }
 
-    if (!product) {
-        throw new Error("Product not found");
-    }
+    // if (!product.ok) {
+    //     throw new Error("Product not found");
+    // }
 
 
 
