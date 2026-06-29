@@ -80,8 +80,8 @@ export default function MyOrdersTable({ currentUserMail }) {
 
   const getStatusBadge = (status) => {
     switch (status?.toLowerCase()) {
-      case 'accepted':
-        return <span className="bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-green-500/20">Accepted</span>;
+      case 'shipped':
+       return <span className="bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-blue-500/20">Shipped</span>;
       case 'processing':
         return <span className="bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-500/20">Processing</span>;
       case 'pending':
@@ -203,7 +203,7 @@ export default function MyOrdersTable({ currentUserMail }) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log("🟢 Cancel Button Clicked! Order ID:", order._id);
+                            // console.log("🟢 Cancel Button Clicked! Order ID:", order._id);
                             setOrderToCancel(order._id);
                             setIsAlertOpen(true);
                           }}

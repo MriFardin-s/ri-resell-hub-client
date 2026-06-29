@@ -34,7 +34,7 @@ export function AddProductForm({ user }) {
             url: URL.createObjectURL(file),
             id: Math.random().toString(36).substr(2, 9)
         }));
-
+     
         setPreviews((prev) => [...prev, ...newPreviews].slice(0, 3));
         if (newPreviews.length > 0) {
             setErrors(prev => ({ ...prev, images: null }));
@@ -117,7 +117,7 @@ export function AddProductForm({ user }) {
                     userId: user?._id || user?.id,
                     name: user?.name,
                     email: user?.email,
-                    phone: rawData.phone 
+                    phone: rawData.phone
                 },
                 price: Number(rawData.price),
                 stock: Number(rawData.stock),

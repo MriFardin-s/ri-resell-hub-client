@@ -24,12 +24,13 @@ export default function Navbar() {
         seller: '/dashboard/seller',
         admin: '/dashboard/admin'
     };
-   
+
     const userRole = user?.userRole?.toLowerCase() || 'buyer';
 
     const navLinks = [
         { name: 'Home', href: '/' },
         { name: 'Products', href: '/products' },
+        { name: 'Categories', href: '/categories' },
         ...(user?.email && dashboardLink[userRole]
             ? [{ name: 'Dashboard', href: dashboardLink[userRole] }]
             : [])
@@ -86,14 +87,14 @@ export default function Navbar() {
                         </button>
                     </div>
 
-                
+
                     <div className="flex-shrink-0 flex items-center">
                         <Link href="/" className="text-2xl font-black tracking-wider text-neutral-800 dark:text-neutral-100">
                             RESELL<span className="text-neutral-900 bg-theme-yellow-primary px-2 py-1 rounded ml-1">HUB</span>
                         </Link>
                     </div>
 
-                  
+
                     <div className="hidden md:flex space-x-8 font-medium">
                         {navLinks.map((link) => {
                             const isActive = pathname === link.href;
@@ -112,9 +113,9 @@ export default function Navbar() {
                         })}
                     </div>
 
-          
+
                     <div className="flex items-center space-x-4">
-                     
+
                         <button
                             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                             className="p-2 rounded-xl text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-900 transition focus:outline-none"
@@ -131,7 +132,7 @@ export default function Navbar() {
                             )}
                         </button>
 
-                   
+
                         {user ? (
                             <div className="relative flex items-center space-x-3">
                                 <span className="hidden sm:inline text-sm font-medium text-neutral-700 dark:text-neutral-300">Hi, {user.name}!</span>
@@ -167,7 +168,7 @@ export default function Navbar() {
                                 )}
                             </div>
                         ) : (
-                           
+
                             <div className="hidden sm:flex items-center space-x-3">
                                 <Link
                                     href="/auth/signin"
@@ -189,7 +190,7 @@ export default function Navbar() {
                 </div>
             </div>
 
-  
+
             {isMobileMenuOpen && (
                 <div className="md:hidden bg-gray-50 dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-800 px-4 pt-2 pb-4 space-y-1 transition-colors duration-300">
                     <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-neutral-800 mb-2">

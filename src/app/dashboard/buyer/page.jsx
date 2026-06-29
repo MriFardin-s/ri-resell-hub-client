@@ -21,7 +21,7 @@ export default function BuyerDashboardHome() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    
+
     if (isPending || !currentUserMail) return;
 
     const fetchDashboardSummary = async () => {
@@ -47,19 +47,26 @@ export default function BuyerDashboardHome() {
     };
 
     fetchDashboardSummary();
-  }, [currentUserMail, isPending]); 
+  }, [currentUserMail, isPending]);
 
   const getStatusClass = (status) => {
     switch (status?.toLowerCase()) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-      case 'processing': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-      case 'delivered': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'cancelled': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-neutral-800 dark:text-neutral-400';
+      case 'pending':
+        return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20';
+      case 'processing':
+        return 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20';
+      case 'shipped':
+        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20';
+      case 'delivered':
+        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20';
+      case 'cancelled':
+        return 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20';
+      default:
+        return 'bg-neutral-500/10 text-neutral-600 dark:text-neutral-400 border border-neutral-500/20';
     }
   };
 
-  
+
   if (isPending || loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-2">
@@ -69,7 +76,7 @@ export default function BuyerDashboardHome() {
     );
   }
 
- 
+
   if (!currentUserMail) {
     return (
       <div className="max-w-md mx-auto mt-12 text-center py-12 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800">
@@ -83,7 +90,7 @@ export default function BuyerDashboardHome() {
     <div className="space-y-8 p-6 max-w-7xl mx-auto animate-in fade-in duration-300">
       <div>
         <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
-          Hi {user?.name}! 
+          Hi {user?.name}!
         </h1>
         <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1">
           Here is a summary of your recent marketplace activity.

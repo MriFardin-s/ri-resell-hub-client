@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import { ProductCard } from '@/components/products/ProductCard';
 import { TextField, Label, InputGroup } from '@heroui/react';
@@ -10,6 +11,7 @@ export default function ProductExploreSection({ products, filters, total }) {
     const [search, setSearch] = useState(filters.search || "");
     const [category, setCategory] = useState(filters.category || "all");
     const [condition, setCondition] = useState(filters.condition || "all");
+    const [sort, setSort] = useState(filters.sort || "default");
     const [page, setPage] = useState(filters.page || 1);
 
     const categories = [
@@ -70,27 +72,33 @@ export default function ProductExploreSection({ products, filters, total }) {
             sp.set("condition", condition);
         }
 
+        if (sort !== "default") {
+            sp.set("sort", sort);
+        }
+
         if (page > 1) {
             sp.set("page", page);
         }
 
         router.push(`/products?${sp.toString()}`);
-    }, [search, category, condition, page, router]);
+    }, [search, category, condition, sort, page, router]);
 
     useEffect(() => {
         setPage(1);
-    }, [search, category, condition]);
+    }, [search, category, condition, sort]);
 
     const handleReset = () => {
         setSearch("");
         setCategory("all");
         setCondition("all");
+        setSort("default");
         setPage(1);
     };
+
     return (
         <>
             <div className="bg-white dark:bg-neutral-900 border border-amber-100 dark:border-neutral-800 rounded-3xl shadow-sm p-6 mb-8 transition-colors duration-300">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-end">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 items-end">
 
                     <div>
                         <TextField>
@@ -137,6 +145,19 @@ export default function ProductExploreSection({ products, filters, total }) {
                     </div>
 
                     <div>
+                        <Label className="text-xs font-bold text-gray-700 dark:text-neutral-300 uppercase tracking-wider mb-1.5 block">Sort By Price</Label>
+                        <select
+                            value={sort}
+                            onChange={(e) => setSort(e.target.value)}
+                            className="w-full h-11 px-3 bg-gray-50 dark:bg-neutral-800/40 border border-gray-200 dark:border-neutral-800 rounded-xl text-sm focus:outline-none focus:border-theme-yellow-primary focus:bg-white dark:focus:bg-neutral-900 text-gray-800 dark:text-neutral-100 transition-all cursor-pointer"
+                        >
+                            <option value="default" className="dark:bg-neutral-900">Default Sorting</option>
+                            <option value="price_asc" className="dark:bg-neutral-900">Price Low to High</option>
+                            <option value="price_desc" className="dark:bg-neutral-900">Price High to Low</option>
+                        </select>
+                    </div>
+
+                    <div>
                         <button
                             type="button"
                             onClick={handleReset}
@@ -156,7 +177,6 @@ export default function ProductExploreSection({ products, filters, total }) {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
                     {products.map((product) => (
                         <ProductCard
                             key={product._id?.$oid || product._id}
@@ -165,6 +185,7 @@ export default function ProductExploreSection({ products, filters, total }) {
                     ))}
                 </div>
             )}
+
             {totalPages > 1 && (
                 <div className="mt-10">
                     <Pagination className="w-full">
@@ -173,7 +194,6 @@ export default function ProductExploreSection({ products, filters, total }) {
                         </Pagination.Summary>
 
                         <Pagination.Content>
-
                             <Pagination.Item>
                                 <Pagination.Previous
                                     isDisabled={page === 1}
@@ -210,7 +230,6 @@ export default function ProductExploreSection({ products, filters, total }) {
                                     <Pagination.NextIcon />
                                 </Pagination.Next>
                             </Pagination.Item>
-
                         </Pagination.Content>
                     </Pagination>
                 </div>

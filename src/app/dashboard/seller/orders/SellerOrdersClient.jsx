@@ -7,12 +7,12 @@ import { CircleDashed } from '@gravity-ui/icons';
 import { useEffect, useState } from 'react';
 
 const STATUS_STYLES = {
-  pending: "bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400",
-  accepted: "bg-sky-100 text-sky-700 dark:bg-sky-950/30 dark:text-sky-400",
-  processing: "bg-[#F3E8FF] text-[#9333EA] dark:bg-purple-950/40 dark:text-purple-400", 
-  shipped: "bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400",
-  delivered: "bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400",
-  cancelled: "bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400",
+  pending: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
+  accepted: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20",
+  processing: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20", 
+  shipped: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
+  delivered: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
+  cancelled: "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20",
 };
 
 export default function SellerOrdersClient({ user }) {

@@ -12,7 +12,7 @@ export default function SellerProductsTable({ initialProducts }) {
     const [products, setProducts] = useState(initialProducts || []);
     const [searchTerm, setSearchTerm] = useState('');
 
-    
+
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -23,20 +23,21 @@ export default function SellerProductsTable({ initialProducts }) {
     );
 
     const CONDITION_STYLES = {
-        new: "bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/50",
-        used: "bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/50",
-        draft: "bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50",
+        new: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
+        used: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
+        draft: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20",
     };
 
     const STATUS_STYLES = {
-        pending: "bg-yellow-50 text-yellow-700 border border-yellow-200 dark:bg-yellow-950/40 dark:text-yellow-400 dark:border-yellow-900/50",
-        available: "bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/50",
-        sold: "bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50",
-        rejected: "bg-gray-100 text-gray-700 border border-gray-300 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700",
-        draft: "bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50",
+        pending: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
+        available: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
+        sold: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20",
+        rejected: "bg-neutral-500/10 text-neutral-600 dark:text-neutral-400 border border-neutral-500/20",
+        draft: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20",
+
     };
 
-    
+
     const handleDeleteConfirm = async () => {
         if (!productToDelete) return;
         try {
@@ -50,7 +51,7 @@ export default function SellerProductsTable({ initialProducts }) {
                     )
                 );
                 toast.success("Product deleted successfully");
-                setIsAlertOpen(false); 
+                setIsAlertOpen(false);
             } else {
                 toast.error(result.message || "Failed to delete");
             }
@@ -141,13 +142,13 @@ export default function SellerProductsTable({ initialProducts }) {
                                                     >
                                                         <Pencil />
                                                     </Link>
-                                                    
-                                                    
+
+
                                                     <button
                                                         type="button"
                                                         onClick={() => {
-                                                            setProductToDelete(id); 
-                                                            setIsAlertOpen(true);    
+                                                            setProductToDelete(id);
+                                                            setIsAlertOpen(true);
                                                         }}
                                                         className="px-3 py-1.5 text-xs font-bold bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/50 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 transition-all"
                                                     >
@@ -164,7 +165,7 @@ export default function SellerProductsTable({ initialProducts }) {
                 </Table>
             </div>
 
-            
+
             <DeleteConfirmDialog
                 isOpen={isAlertOpen}
                 onOpenChange={setIsAlertOpen}

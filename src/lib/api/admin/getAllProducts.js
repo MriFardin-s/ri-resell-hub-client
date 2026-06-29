@@ -1,6 +1,14 @@
-import { serverFetch } from "@/lib/core/server";
+import { protectedFetch } from "@/lib/core/server";
 
+export const getAllProducts = async (filters = {}) => {
+  const { search, status } = filters;
+  const params = new URLSearchParams();
 
-export const getAllProducts = async () => {
-  return serverFetch("/api/all/products");
+  if (search) params.append('search', search);
+  if (status && status !== 'all') params.append('status', status);
+
+  const queryString = params.toString();
+  const url = `/api/admin/all/products${queryString ? `?${queryString}` : ''}`;
+
+  return protectedFetch(url);
 };

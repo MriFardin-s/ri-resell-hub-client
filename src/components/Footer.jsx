@@ -34,8 +34,9 @@ export default function Footer() {
                 <Link href="/categories" className="hover:text-theme-yellow-primary transition-colors duration-200">Categories</Link>
               </li>
               <li>
-                <Link href="/dashboard" className="hover:text-theme-yellow-primary transition-colors duration-200">User Dashboard</Link>
+                <Link href="/about" className="hover:text-theme-yellow-primary transition-colors duration-200">About Us</Link>
               </li>
+              
             </ul>
           </div>
 
